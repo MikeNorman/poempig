@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poem Pig - Root out poems</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #4A90E2 0%, #7B68EE 50%, #9370DB 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .nav {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 15px 0;
+            margin-bottom: 30px;
+            border-radius: 15px;
+        }
+        
+        .nav-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .nav-btn.active {
+            background: rgba(255, 255, 255, 0.4);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .pig-icon {
+            font-size: 4rem;
+            animation: wiggle 2s ease-in-out infinite;
+        }
+        
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+        }
+        
+        .header p {
+            font-size: 1.4rem;
+            opacity: 0.95;
+            font-style: italic;
+        }
+        
+        .search-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            margin-bottom: 40px;
+            border: 3px solid #4A90E2;
+        }
+        
+        .search-form {
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 30px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #4A90E2;
+            font-size: 1.2rem;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 20px;
+            border: 3px solid #7B68EE;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-family: 'Georgia', serif;
+            transition: all 0.3s ease;
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #4A90E2;
+            box-shadow: 0 0 15px rgba(74, 144, 226, 0.3);
+        }
+        
+        .search-input::placeholder {
+            color: #999;
+            font-style: italic;
+        }
+        
+        .search-btn {
+            background: linear-gradient(135deg, #4A90E2 0%, #7B68EE 100%);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            border-radius: 15px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .search-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        
+        .search-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .nav-buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .nav-btn {
+            background: linear-gradient(135deg, #7B68EE 0%, #9370DB 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+        
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .results {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+            border: 3px solid #4A90E2;
+        }
+        
+        .results h2 {
+            margin-bottom: 25px;
+            color: #4A90E2;
+            text-align: center;
+            font-size: 1.8rem;
+        }
+        
+        .poem-card {
+            border: 2px solid #7B68EE;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+            background: #F0F8FF;
+        }
+        
+        .poem-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-color: #4A90E2;
+        }
+        
+        .poem-title {
+            font-size: 1.05rem;
+            font-weight: bold;
+            color: #4A90E2;
+            margin-bottom: 7px;
+        }
+        
+        .poem-author {
+            color: #7B68EE;
+            font-style: italic;
+            margin-bottom: 10px;
+            font-size: 0.77rem;
+        }
+        
+        .poem-text {
+            white-space: pre-line;
+            line-height: 1.8;
+            color: #444;
+            margin-bottom: 14px;
+            font-size: 0.77rem;
+        }
+        
+        .poem-meta {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            font-size: 0.63rem;
+            color: #666;
+        }
+        
+        .save-btn {
+            background: linear-gradient(135deg, #228B22 0%, #32CD32 100%);
+            color: white;
+            border: none;
+            padding: 7px 14px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .save-btn.saved {
+            background: linear-gradient(135deg, #4A90E2 0%, #7B68EE 100%);
+        }
+        
+        .load-more-btn {
+            background: linear-gradient(135deg, #7B68EE 0%, #9370DB 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            margin: 20px auto;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .load-more-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        
+        .load-more-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #4A90E2;
+            font-size: 1.2rem;
+        }
+        
+        .error {
+            background: #FFE4E1;
+            color: #8B0000;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 5px solid #8B0000;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+            font-style: italic;
+            font-size: 1.2rem;
+        }
+        
+        .help-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            margin-bottom: 40px;
+            border: 3px solid #4A90E2;
+        }
+        
+        .help-text {
+            background: #F0F8FF;
+            border: 2px solid #7B68EE;
+            border-radius: 10px;
+            padding: 20px;
+            color: #4A90E2;
+        }
+        
+        .help-text h3 {
+            margin-bottom: 15px;
+            color: #4A90E2;
+            font-size: 1.3rem;
+        }
+        
+        .help-text ul {
+            text-align: left;
+            margin-left: 20px;
+        }
+        
+        .help-text li {
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2.5rem;
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .search-container, .results, .help-container {
+                padding: 20px;
+            }
+            
+            .search-input {
+                font-size: 1rem;
+                min-height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="nav">
+            <div class="nav-content">
+                <a href="/vibes" class="nav-btn">Vibe List</a>
+            </div>
+        </nav>
+        
+        <div class="header">
+            <h1>
+                <span class="pig-icon">🐷</span>
+                Poem Pig
+            </h1>
+            <p>Root out poems</p>
+        </div>
+        
+        <div class="search-container">
+            <form class="search-form" onsubmit="searchPoems(event)">
+                <div class="form-group">
+                    <label for="search-query">What kind of poem are you looking for?</label>
+                    <textarea 
+                        id="search-query" 
+                        class="search-input"
+                        placeholder="Describe what you want... Use quotes for exact phrases like &quot;roses are red&quot; or &quot;winter snow&quot;"
+                    ></textarea>
+                </div>
+                <button type="submit" class="search-btn">🐷 Sniff Out Poems</button>
+            </form>
+        </div>
+        
+        <div id="results" class="results" style="display: none;">
+            <h2 id="results-title">Search Results</h2>
+            <div id="results-content"></div>
+            <button id="load-more-btn" class="load-more-btn" style="display: none;" onclick="loadMorePoems()">
+                Get 5 More Poems
+            </button>
+        </div>
+        
+        <div class="help-container">
+            <div class="help-text">
+                <h3>How to search like a Poem Pig:</h3>
+                <ul>
+                    <li><strong>Natural language:</strong> "poems about love and loss"</li>
+                    <li><strong>Keywords:</strong> "love", "death", "nature"</li>
+                    <li><strong>Exact phrases:</strong> Use quotes like "roses are red" or "winter snow"</li>
+                    <li><strong>Mix both:</strong> "sad poems about &quot;autumn leaves&quot; falling"</li>
+                    <li><strong>Authors:</strong> "Robert Frost", "Emily Dickinson"</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let savedPoems = new Set();
+        let currentQuery = '';
+        let currentOffset = 0;
+        let allResults = [];
+        let displayedResults = [];
+        
+        function showLoading() {
+            const resultsDiv = document.getElementById('results');
+            const contentDiv = document.getElementById('results-content');
+            
+            resultsDiv.style.display = 'block';
+            contentDiv.innerHTML = '<div class="loading">🐷 Sniffing through poems...</div>';
+        }
+        
+        function showError(message) {
+            const resultsDiv = document.getElementById('results');
+            const contentDiv = document.getElementById('results-content');
+            
+            resultsDiv.style.display = 'block';
+            contentDiv.innerHTML = `<div class="error">❌ ${message}</div>`;
+        }
+        
+        function showResults(results, title, isLoadMore = false) {
+            const resultsDiv = document.getElementById('results');
+            const contentDiv = document.getElementById('results-content');
+            const titleDiv = document.getElementById('results-title');
+            const loadMoreBtn = document.getElementById('load-more-btn');
+            
+            resultsDiv.style.display = 'block';
+            titleDiv.textContent = title;
+            
+            if (results.length === 0 && !isLoadMore) {
+                contentDiv.innerHTML = '<div class="no-results">No poems found. Try a different search, little piggy! 🐷</div>';
+                loadMoreBtn.style.display = 'none';
+                return;
+            }
+            
+            if (isLoadMore) {
+                // Append to existing results
+                displayedResults = displayedResults.concat(results);
+            } else {
+                // New search - reset everything
+                displayedResults = results;
+                allResults = results;
+                currentOffset = results.length;
+            }
+            
+            let html = '';
+            displayedResults.forEach((result, index) => {
+                const poem = result.poem || result;
+                const isSaved = savedPoems.has(poem.id);
+                
+                html += `
+                    <div class="poem-card">
+                        <div class="poem-title">${poem.title || 'Untitled'}</div>
+                        <div class="poem-author">by ${poem.author || 'Unknown'}</div>
+                        <div class="poem-text">${poem.text}</div>
+                        <div class="poem-meta">
+                            <button class="save-btn ${isSaved ? 'saved' : ''}" 
+                                    onclick="togglePoemSave('${poem.id}', this)">
+                                ${isSaved ? 'Find Similar' : 'Save'}
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            contentDiv.innerHTML = html;
+            
+            // Show/hide load more button
+            if (displayedResults.length >= 10) {
+                loadMoreBtn.style.display = 'block';
+            } else {
+                loadMoreBtn.style.display = 'none';
+            }
+        }
+        
+        function togglePoemSave(poemId, button) {
+            if (savedPoems.has(poemId)) {
+                // If already saved, navigate to find similar page
+                window.location.href = `/find_similar.html?id=${poemId}`;
+            } else {
+                // Save the poem
+                savedPoems.add(poemId);
+                button.textContent = 'Find Similar';
+                button.classList.add('saved');
+            }
+        }
+        
+        async function makeRequest(url, data) {
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Request failed');
+                }
+                
+                return await response.json();
+            } catch (error) {
+                throw error;
+            }
+        }
+        
+        async function searchPoems(event) {
+            event.preventDefault();
+            showLoading();
+            
+            const query = document.getElementById('search-query').value.trim();
+            
+            if (!query) {
+                showError('Please describe what kind of poem you\'re looking for!');
+                return;
+            }
+            
+            currentQuery = query;
+            currentOffset = 0;
+            
+            try {
+                const result = await makeRequest('/search', {
+                    query: query,
+                    top_k: 5
+                });
+                
+                showResults(result.results, `Poems found for "${query}"`);
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+        
+        async function loadMorePoems() {
+            const loadMoreBtn = document.getElementById('load-more-btn');
+            loadMoreBtn.disabled = true;
+            loadMoreBtn.textContent = 'Loading...';
+            
+            try {
+                const result = await makeRequest('/search', {
+                    query: currentQuery,
+                    top_k: 5,
+                    offset: currentOffset
+                });
+                
+                if (result.results.length > 0) {
+                    showResults(result.results, `Poems found for "${currentQuery}"`, true);
+                    currentOffset += result.results.length;
+                } else {
+                    loadMoreBtn.textContent = 'No more poems';
+                    loadMoreBtn.disabled = true;
+                }
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                if (loadMoreBtn.textContent !== 'No more poems') {
+                    loadMoreBtn.disabled = false;
+                    loadMoreBtn.textContent = 'Get 5 More Poems';
+                }
+            }
+        }
+        
+        // Add Enter key support for textarea
+        document.getElementById('search-query').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                searchPoems(event);
+            }
+        });
+    </script>
+</body>
+</html>

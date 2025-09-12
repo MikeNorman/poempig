@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibe Profile - Poem Pig</title>
+    <script>
+        console.log('Page loaded at:', new Date().toISOString());
+        console.log('JavaScript is working!');
+        console.log('Script version:', 'v2.0');
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #4A90E2 0%, #7B68EE 50%, #9370DB 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .nav {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 15px 0;
+            margin-bottom: 30px;
+            border-radius: 15px;
+        }
+        
+        .nav-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+        
+        .nav-btn.active {
+            background: rgba(255, 255, 255, 0.4);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .pig-icon {
+            font-size: 3rem;
+            animation: wiggle 2s ease-in-out infinite;
+        }
+        
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            font-style: italic;
+        }
+        
+        .back-btn {
+            background: linear-gradient(135deg, #7B68EE 0%, #9370DB 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+        
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .vibe-seeds-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            border: 2px solid #4A90E2;
+            position: sticky;
+            top: 20px;
+            height: fit-content;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
+        
+        .vibe-profile-name {
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+            margin-bottom: 15px;
+        }
+        
+        .vibe-seeds-container h2 {
+            color: #4A90E2;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+        
+        .vibe-profile-name {
+            background: transparent;
+            border: 2px solid #4A90E2;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #4A90E2;
+            text-align: center;
+            width: 100%;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .vibe-profile-name:focus {
+            outline: none;
+            border-color: #7B68EE;
+            background: rgba(74, 144, 226, 0.1);
+        }
+        
+        .vibe-profile-name:hover {
+            border-color: #7B68EE;
+        }
+        
+        .suggested-poems-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            border: 2px solid #7B68EE;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
+        
+        .suggested-poems-title {
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #7B68EE;
+        }
+        
+        .suggested-poems-container h2 {
+            color: #7B68EE;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+        
+        .find-more-container {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .find-more-btn {
+            background: linear-gradient(135deg, #7B68EE 0%, #9370DB 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .find-more-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        
+        .find-more-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .poem-card {
+            border: 2px solid #7B68EE;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            background: #F0F8FF;
+        }
+        
+        .poem-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-color: #4A90E2;
+        }
+        
+        .chosen-poem-card {
+            border: 3px solid #4A90E2;
+            background: #E6F3FF;
+        }
+        
+        .poem-title {
+            font-size: 1.05rem;
+            font-weight: bold;
+            color: #4A90E2;
+            margin-bottom: 7px;
+        }
+        
+        .poem-author {
+            color: #7B68EE;
+            font-style: italic;
+            margin-bottom: 10px;
+            font-size: 0.77rem;
+        }
+        
+        .poem-text {
+            white-space: pre-line;
+            line-height: 1.6;
+            color: #444;
+            margin-bottom: 12px;
+            font-size: 0.7rem;
+        }
+        
+        .poem-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.63rem;
+            color: #666;
+            gap: 10px;
+        }
+        
+        .poem-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .same-vibe-btn {
+            color: white;
+            border: none;
+            padding: 7px 14px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%);
+        }
+        
+        .same-vibe-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .same-vibe-btn.added {
+            background: linear-gradient(135deg, #4A90E2 0%, #7B68EE 100%);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #4A90E2;
+            font-size: 1.2rem;
+        }
+        
+        .error {
+            background: #FFE4E1;
+            color: #8B0000;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 5px solid #8B0000;
+        }
+        
+        .loading {
+            color: #7B68EE;
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+        }
+        
+        /* Custom scrollbar styling */
+        .vibe-seeds-container::-webkit-scrollbar,
+        .suggested-poems-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .vibe-seeds-container::-webkit-scrollbar-track,
+        .suggested-poems-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        
+        .vibe-seeds-container::-webkit-scrollbar-thumb,
+        .suggested-poems-container::-webkit-scrollbar-thumb {
+            background: #4A90E2;
+            border-radius: 3px;
+        }
+        
+        .vibe-seeds-container::-webkit-scrollbar-thumb:hover,
+        .suggested-poems-container::-webkit-scrollbar-thumb:hover {
+            background: #357ABD;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .vibe-seeds-container, .suggested-poems-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="nav">
+            <div class="nav-content">
+                <a href="/" class="nav-btn">New Vibe</a>
+                <a href="/vibes" class="nav-btn">Vibe List</a>
+            </div>
+        </nav>
+        
+        <div class="header">
+            <h1>
+                <span class="pig-icon">🐷</span>
+                Vibe Match
+            </h1>
+            <p>Create a vibe and root out matching poems</p>
+        </div>
+        
+        <button class="back-btn" onclick="goBack()">← Back to Search</button>
+        
+        <div class="main-content">
+            <div class="vibe-seeds-container">
+                <input type="text" id="vibe-profile-name" class="vibe-profile-name" placeholder="Vibe Profile Name" value="Vibe Seed">
+                <div id="vibe-seeds-content">
+                    <div class="loading">🐷 Loading chosen poem...</div>
+                </div>
+            </div>
+            
+            <div class="suggested-poems-container">
+                <h2 class="suggested-poems-title">Suggested Poems</h2>
+                <div id="suggested-poems-content">
+                    <div class="loading">Loading similar poems...</div>
+                </div>
+                <div class="find-more-container">
+                    <button id="find-more-btn" class="find-more-btn" onclick="findMorePoems()">
+                        Find 5 More Poems
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Test function
+        function testFunction() {
+            alert('JavaScript is working!');
+            console.log('Test function called');
+        }
+        
+        // Debug function
+        function debugInfo() {
+            console.log('=== DEBUG INFO ===');
+            console.log('poemId:', poemId);
+            console.log('vibeProfileId:', vibeProfileId);
+            console.log('currentVibeProfileId:', currentVibeProfileId);
+            console.log('vibeProfilePoems.size:', vibeProfilePoems.size);
+            console.log('vibeProfilePoems:', Array.from(vibeProfilePoems));
+            console.log('==================');
+        }
+        
+        let vibeProfilePoems = new Set();
+        let currentVibeProfileId = null;
+        let currentVibeProfileName = 'Vibe Seed';
+        let displayedPoemIds = new Set(); // Track poems currently displayed in suggested poems
+        
+        // Get parameters from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const poemId = urlParams.get('id');
+        const vibeProfileId = urlParams.get('vibe_profile_id');
+        
+        if (vibeProfileId) {
+            // Load existing vibe profile
+            loadVibeProfile(vibeProfileId);
+            setupVibeProfileNameEditor();
+        } else if (poemId) {
+            // Load poem and find similar
+            loadChosenPoem();
+            loadSimilarPoems(); // This will load in background
+            setupVibeProfileNameEditor();
+        } else {
+            document.getElementById('vibe-seeds-content').innerHTML = 
+                '<div class="error">❌ No poem ID or vibe profile ID provided</div>';
+            document.getElementById('suggested-poems-content').innerHTML = 
+                '<div class="error">❌ Cannot find similar poems</div>';
+        }
+        
+        function generateVibeProfileName() {
+            const adjectives = ['Mystical', 'Whimsical', 'Melancholic', 'Ethereal', 'Vibrant', 'Serene', 'Passionate', 'Dreamy', 'Bold', 'Gentle', 'Wild', 'Tranquil', 'Fiery', 'Soft', 'Radiant', 'Deep', 'Bright', 'Dark', 'Warm', 'Cool'];
+            const nouns = ['Whispers', 'Echoes', 'Dreams', 'Winds', 'Flames', 'Waves', 'Stars', 'Moon', 'Sun', 'Clouds', 'Rivers', 'Mountains', 'Forests', 'Gardens', 'Meadows', 'Oceans', 'Skies', 'Hearts', 'Souls', 'Spirits'];
+            
+            const adj = adjectives[Math.floor(Math.random() * adjectives.length)];
+            const noun = nouns[Math.floor(Math.random() * nouns.length)];
+            return `${adj} ${noun}`;
+        }
+        
+        function setupVibeProfileNameEditor() {
+            const nameInput = document.getElementById('vibe-profile-name');
+            
+            nameInput.addEventListener('blur', async function() {
+                const newName = this.value.trim() || generateVibeProfileName();
+                this.value = newName;
+                currentVibeProfileName = newName;
+                
+                if (currentVibeProfileId) {
+                    await updateVibeProfileName(newName);
+                }
+            });
+            
+            nameInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    this.blur();
+                }
+            });
+        }
+        
+        async function updateVibeProfileName(name) {
+            if (!currentVibeProfileId) return;
+            
+            try {
+                const response = await fetch('/update-vibe-profile-name', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        vibe_profile_id: currentVibeProfileId, 
+                        name: name 
+                    })
+                });
+                
+                if (!response.ok) {
+                    console.error('Failed to update vibe profile name');
+                }
+            } catch (error) {
+                console.error('Error updating vibe profile name:', error);
+            }
+        }
+        
+        async function loadVibeProfile(vibeProfileId) {
+            try {
+                // Get the vibe profile details
+                const response = await fetch(`/get-vibe-profile/${vibeProfileId}`);
+                if (!response.ok) {
+                    throw new Error('Vibe profile not found');
+                }
+                
+                const vibeProfile = await response.json();
+                console.log('Loaded vibe profile:', vibeProfile);
+                currentVibeProfileId = vibeProfile.id;
+                currentVibeProfileName = vibeProfile.name;
+                console.log('Set currentVibeProfileId to:', currentVibeProfileId);
+                
+                // Ensure URL reflects the vibe profile ID
+                const newUrl = new URL(window.location);
+                newUrl.searchParams.delete('id'); // Remove poem ID if present
+                newUrl.searchParams.set('vibe_profile_id', currentVibeProfileId);
+                window.history.replaceState({}, '', newUrl);
+                
+                // Set the vibe profile name in the input
+                document.getElementById('vibe-profile-name').value = vibeProfile.name;
+                
+                // Load the poems from this vibe profile
+                const poems = vibeProfile.poems || [];
+                vibeProfilePoems.clear();
+                
+                poems.forEach(poem => {
+                    vibeProfilePoems.add(poem.id);
+                });
+                
+                // Display the vibe seeds immediately
+                await displayVibeSeeds();
+                
+                // Load similar poems in the background (don't await)
+                loadSimilarToVibeProfile();
+                
+            } catch (error) {
+                console.error('Error loading vibe profile:', error);
+                document.getElementById('vibe-seeds-content').innerHTML = 
+                    '<div class="error">❌ Error loading vibe profile</div>';
+                document.getElementById('suggested-poems-content').innerHTML = 
+                    '<div class="error">❌ Cannot load similar poems</div>';
+            }
+        }
+        
+        async function loadSimilarToVibeProfile() {
+            try {
+                const response = await fetch('/find-similar-to-vibe-profile', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        vibe_profile_id: currentVibeProfileId,
+                        top_k: 5
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Failed to find similar poems');
+                }
+                
+                const data = await response.json();
+                displaySuggestedPoems(data.results || []);
+                
+            } catch (error) {
+                console.error('Error finding similar poems:', error);
+                document.getElementById('suggested-poems-content').innerHTML = 
+                    '<div class="error">❌ Error finding similar poems</div>';
+            }
+        }
+        
+        async function loadChosenPoem() {
+            try {
+                const response = await fetch(`/poem/${poemId}`);
+                if (!response.ok) {
+                    throw new Error('Poem not found');
+                }
+                
+                const poem = await response.json();
+                vibeProfilePoems.add(poem.id);
+                displayVibeSeeds();
+            } catch (error) {
+                document.getElementById('vibe-seeds-content').innerHTML = 
+                    `<div class="error">❌ Error loading poem: ${error.message}</div>`;
+            }
+        }
+        
+        async function loadSimilarPoems() {
+            try {
+                const response = await fetch('/find-similar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ poem_id: poemId, top_k: 5 })
+                });
+                
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to find similar poems');
+                }
+                
+                const result = await response.json();
+                displaySuggestedPoems(result.results);
+            } catch (error) {
+                document.getElementById('suggested-poems-content').innerHTML = 
+                    `<div class="error">❌ Error finding similar poems: ${error.message}</div>`;
+            }
+        }
+        
+        async function displayVibeSeeds() {
+            const nameInput = document.getElementById('vibe-profile-name');
+            const content = document.getElementById('vibe-seeds-content');
+            
+            if (vibeProfilePoems.size === 0) {
+                content.innerHTML = '<div class="loading">🐷 Loading chosen poem...</div>';
+                return;
+            }
+            
+            // Update placeholder based on count
+            nameInput.placeholder = vibeProfilePoems.size === 1 ? 'Vibe Seed' : 'Vibe Seeds';
+            
+            // Load all poems in vibe profile
+            const poems = [];
+            for (const poemId of vibeProfilePoems) {
+                try {
+                    const response = await fetch(`/poem/${poemId}`);
+                    if (response.ok) {
+                        const poem = await response.json();
+                        poems.push(poem);
+                    }
+                } catch (error) {
+                    console.error(`Error loading poem ${poemId}:`, error);
+                }
+            }
+            
+            let html = '';
+            poems.forEach(poem => {
+                html += `
+                    <div class="poem-card chosen-poem-card">
+                        <div class="poem-title">${poem.title || 'Untitled'}</div>
+                        <div class="poem-author">by ${poem.author || 'Unknown'}</div>
+                        <div class="poem-text">${poem.text}</div>
+                    </div>
+                `;
+            });
+            
+            content.innerHTML = html;
+        }
+        
+        function displaySuggestedPoems(poems, append = false) {
+            console.log('displaySuggestedPoems called with:', poems, 'append:', append);
+            if (!poems || poems.length === 0) {
+                if (!append) {
+                    document.getElementById('suggested-poems-content').innerHTML = 
+                        '<div class="error">No similar poems found</div>';
+                }
+                return;
+            }
+            
+            // Clear displayed poems only if not appending
+            if (!append) {
+                displayedPoemIds.clear();
+            }
+            
+            let html = '';
+            poems.forEach((result) => {
+                // The API returns {poem: {...}, similarity: ...}
+                const poem = result.poem;
+                if (!poem) return;
+                
+                // Track this poem as displayed
+                displayedPoemIds.add(poem.id);
+                
+                const isInVibeProfile = vibeProfilePoems.has(poem.id);
+                
+                html += `
+                    <div class="poem-card">
+                        <div class="poem-title">${poem.title || 'Untitled'}</div>
+                        <div class="poem-author">by ${poem.author || 'Unknown'}</div>
+                        <div class="poem-text">${poem.text}</div>
+                        <div class="poem-meta">
+                            <div class="poem-buttons">
+                                <button class="same-vibe-btn ${isInVibeProfile ? 'added' : ''}"
+                                        onclick="addToVibeProfile('${poem.id}', this)">
+                                    ${isInVibeProfile ? 'Added' : 'Add'}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            const contentElement = document.getElementById('suggested-poems-content');
+            if (append) {
+                contentElement.innerHTML += html;
+            } else {
+                contentElement.innerHTML = html;
+            }
+        }
+        
+        
+        async function addToVibeProfile(poemId, button) {
+            console.log('addToVibeProfile called with poemId:', poemId);
+            
+            if (vibeProfilePoems.has(poemId)) {
+                // Already in vibe profile, remove it
+                console.log('Removing poem from vibe profile');
+                vibeProfilePoems.delete(poemId);
+                button.textContent = 'Add';
+                button.classList.remove('added');
+            } else {
+                // Add to vibe profile
+                console.log('Adding poem to vibe profile');
+                vibeProfilePoems.add(poemId);
+                button.textContent = 'Added';
+                button.classList.add('added');
+                
+                // Remove the poem from suggested poems display
+                removePoemFromSuggested(poemId);
+            }
+            
+            // Update the vibe profile in the database
+            await updateVibeProfileInDatabase();
+            
+            // Refresh the vibe seeds display
+            await displayVibeSeeds();
+        }
+        
+        
+        function removePoemFromSuggested(poemId) {
+            // Find and remove the poem card from suggested poems
+            const suggestedContainer = document.getElementById('suggested-poems-content');
+            const poemCards = suggestedContainer.querySelectorAll('.poem-card');
+            
+            poemCards.forEach(card => {
+                const buttons = card.querySelectorAll('button');
+                buttons.forEach(button => {
+                    if (button.onclick && button.onclick.toString().includes(poemId)) {
+                        // This is the card with the poem we want to remove
+                        card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                        card.style.opacity = '0';
+                        card.style.transform = 'translateX(-20px)';
+                        
+                        setTimeout(() => {
+                            card.remove();
+                        }, 300);
+                    }
+                });
+            });
+        }
+        
+        async function updateVibeProfileInDatabase() {
+            console.log('updateVibeProfileInDatabase called, currentVibeProfileId:', currentVibeProfileId);
+            console.log('Poems to add:', Array.from(vibeProfilePoems));
+            
+            // Only create a vibe profile if we have 2 or more poems
+            if (!currentVibeProfileId && vibeProfilePoems.size >= 2) {
+                // Generate a name for the vibe profile
+                const generatedName = generateVibeProfileName();
+                currentVibeProfileName = generatedName;
+                document.getElementById('vibe-profile-name').value = generatedName;
+                
+                console.log('Creating new vibe profile with name:', generatedName);
+                
+                // Create a new vibe profile
+                try {
+                    const response = await fetch('/create-vibe-profile', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ 
+                            name: generatedName,
+                            poem_ids: Array.from(vibeProfilePoems)
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        currentVibeProfileId = result.vibe_profile_id;
+                        console.log('Created vibe profile with ID:', currentVibeProfileId);
+                        
+                        // Update the URL to reflect the vibe profile ID
+                        const newUrl = new URL(window.location);
+                        newUrl.searchParams.delete('id'); // Remove poem ID
+                        newUrl.searchParams.set('vibe_profile_id', currentVibeProfileId);
+                        window.history.replaceState({}, '', newUrl);
+                    } else {
+                        console.error('Failed to create vibe profile:', response.status, response.statusText);
+                    }
+                } catch (error) {
+                    console.error('Error creating vibe profile:', error);
+                }
+            } else if (!currentVibeProfileId && vibeProfilePoems.size < 2) {
+                console.log('Not creating vibe profile yet - need at least 2 poems (currently have', vibeProfilePoems.size, ')');
+                return; // Exit early if we don't have enough poems
+            }
+            
+            if (currentVibeProfileId) {
+                console.log('Adding poems to vibe profile:', currentVibeProfileId);
+                // Add all poems to the vibe profile
+                for (const poemId of vibeProfilePoems) {
+                    try {
+                        console.log('Adding poem to vibe profile:', poemId);
+                        const response = await fetch('/add-to-vibe-profile', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ 
+                                poem_id: poemId, 
+                                vibe_profile_id: currentVibeProfileId 
+                            })
+                        });
+                        
+                        if (response.ok) {
+                            console.log('Successfully added poem to vibe profile');
+                        } else {
+                            console.error('Failed to add poem to vibe profile:', response.status, response.statusText);
+                        }
+                    } catch (error) {
+                        console.error(`Error adding poem ${poemId} to vibe profile:`, error);
+                    }
+                }
+            } else {
+                console.error('No vibe profile ID available');
+            }
+        }
+        
+        async function findMorePoems() {
+            console.log('findMorePoems called');
+            const button = document.getElementById('find-more-btn');
+            button.disabled = true;
+            button.textContent = 'Loading...';
+            
+            try {
+                let response;
+                console.log('vibeProfilePoems.size:', vibeProfilePoems.size);
+                console.log('currentVibeProfileId:', currentVibeProfileId);
+                
+                if (vibeProfilePoems.size > 1) {
+                    // Multiple poems - vibe profile MUST exist (created when 2nd poem added)
+                    if (!currentVibeProfileId) {
+                        throw new Error('Vibe profile should exist for multiple poems');
+                    }
+                    
+                    console.log('Using vibe profile API');
+                    // Use existing vibe profile
+                    response = await fetch('/find-similar-to-vibe-profile', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ 
+                            vibe_profile_id: currentVibeProfileId, 
+                            top_k: 5,
+                            exclude_poem_ids: Array.from(displayedPoemIds)
+                        })
+                    });
+                } else {
+                    console.log('Using single poem API');
+                    // Single poem - use that poem's vector
+                    response = await fetch('/find-similar', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ 
+                            poem_id: poemId, 
+                            top_k: 5,
+                            exclude_poem_ids: Array.from(new Set([...vibeProfilePoems, ...displayedPoemIds]))
+                        })
+                    });
+                }
+                
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.error || 'Failed to find more poems');
+                }
+                
+                const result = await response.json();
+                console.log('API result:', result);
+                console.log('Calling displaySuggestedPoems with append=true:', result.results);
+                displaySuggestedPoems(result.results || [], true);
+            } catch (error) {
+                console.error('Error in findMorePoems:', error);
+                document.getElementById('suggested-poems-content').innerHTML = 
+                    `<div class="error">❌ Error finding more poems: ${error.message}</div>`;
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Find 5 More Poems';
+            }
+        }
+        
+        function goBack() {
+            window.history.back();
+        }
+    </script>
+</body>
+</html>
