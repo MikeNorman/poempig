@@ -2,7 +2,7 @@
 Flask Web Application for Poem Recommender
 """
 
-from flask import Flask, render_template, request, jsonify, send_from_directory
+from flask import Flask, render_template, request, jsonify, send_from_directory, redirect
 from flask_cors import CORS
 import os
 from dotenv import load_dotenv
@@ -129,7 +129,9 @@ def create_vibe_profile():
         name = data.get('name', 'Untitled Vibe Profile')
         item_ids = data.get('item_ids', [])
         
+        print(f"Creating vibe profile with name: '{name}' and {len(item_ids)} items")
         vibe_profile_id = vibe_manager.create_vibe_profile(name, item_ids)
+        print(f"Created vibe profile with ID: {vibe_profile_id}")
         
         if vibe_profile_id:
             return jsonify({
@@ -275,6 +277,7 @@ def get_vibe_profile(vibe_profile_id):
         if not vibe_profile:
             return jsonify({'error': 'Vibe profile not found'}), 404
         
+        print(f"Returning vibe profile: {vibe_profile.get('name', 'NO NAME')} (ID: {vibe_profile_id})")
         return jsonify(vibe_profile)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -291,23 +294,38 @@ def get_vibe_profiles():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/vibe-profile/<vibe_profile_id>')
-def vibe_profile_page(vibe_profile_id):
-    """Individual vibe profile page with side-by-side container UX"""
-    try:
-        # Get the vibe profile data directly
-        vibe_profile = vibe_manager.get_vibe_profile_with_poems(vibe_profile_id)
-        
-        if not vibe_profile:
-            return render_template('error.html', 
-                                 error_title="Vibe Profile Not Found",
-                                 error_message="The requested vibe profile could not be found."), 404
+@app.route('/vibe-profile.html')
+def vibe_profile_page():
+    """Vibe profile page that handles both existing vibe profiles and new seed items"""
+    vibe_profile_id = request.args.get('vibe_profile_id')
+    seed_id = request.args.get('seed_id')
+    
+    if vibe_profile_id:
+        # Load existing vibe profile
+        try:
+            vibe_profile = vibe_manager.get_vibe_profile_with_poems(vibe_profile_id)
+            if not vibe_profile:
+                return render_template('error.html', 
+                                     error_title="Vibe Profile Not Found",
+                                     error_message="The requested vibe profile could not be found."), 404
             
-        return render_template('vibe_profile.html', vibe_profile=vibe_profile)
-    except Exception as e:
-        return render_template('error.html',
-                             error_title="Error Loading Vibe Profile", 
-                             error_message=f"An error occurred while loading the vibe profile: {str(e)}"), 500
+            return render_template('vibe_profile.html', vibe_profile=vibe_profile)
+        except Exception as e:
+            return render_template('error.html', 
+                                 error_title="Error Loading Vibe Profile",
+                                 error_message=f"An error occurred while loading the vibe profile: {str(e)}"), 500
+    elif seed_id:
+        # New vibe profile with seed item - no vibe_profile data needed
+        return render_template('vibe_profile.html')
+    else:
+        return render_template('error.html', 
+                             error_title="Invalid Request",
+                             error_message="No vibe profile ID or seed ID provided."), 400
+
+@app.route('/vibe-profile/<vibe_profile_id>')
+def vibe_profile_redirect(vibe_profile_id):
+    """Redirect old vibe profile URLs to new format"""
+    return redirect(f'/vibe-profile.html?vibe_profile_id={vibe_profile_id}')
 
 @app.route('/delete-vibe-profile/<vibe_profile_id>', methods=['DELETE'])
 def delete_vibe_profile(vibe_profile_id):
@@ -323,6 +341,30 @@ def delete_vibe_profile(vibe_profile_id):
             return jsonify({'error': f'Failed to delete vibe profile {vibe_profile_id}'}), 500
     except Exception as e:
         return jsonify({'error': f'Error deleting vibe profile: {str(e)}'}), 500
+
+@app.route('/search-keywords', methods=['POST'])
+def search_keywords():
+    """Search items by keywords in title, author, or text"""
+    if not engine:
+        return jsonify({'error': 'Recommendation engine not available'}), 500
+    
+    try:
+        data = request.get_json()
+        keywords = data.get('keywords', '').strip()
+        
+        if not keywords:
+            return jsonify({'results': []})
+        
+        # Search for items containing the keywords
+        results = engine.search_by_keywords(keywords)
+        
+        return jsonify({
+            'results': results,
+            'keywords': keywords
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Search failed: {str(e)}'}), 500
 
 @app.route('/health')
 def health():

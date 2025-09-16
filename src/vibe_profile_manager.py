@@ -122,8 +122,11 @@ class VibeProfileManager:
             # Check if a vibe profile with this name already exists
             existing = self.supabase.table('vibe_profiles').select('id').eq('name', name).execute()
             if existing.data:
-                print(f"Vibe profile with name '{name}' already exists")
-                return existing.data[0]['id']  # Return existing ID
+                # Generate a unique name by adding a timestamp
+                import time
+                unique_name = f"{name} ({int(time.time())})"
+                print(f"Vibe profile with name '{name}' already exists, using '{unique_name}'")
+                name = unique_name
             
             # If item_ids are provided, check for content duplicates
             if item_ids:
@@ -412,7 +415,7 @@ class VibeProfileManager:
                             similarity = 0.0
                     
                     similarities.append({
-                        'poem': poem,
+                        'item': poem,
                         'similarity': similarity
                     })
                 
@@ -471,7 +474,7 @@ class VibeProfileManager:
                             similarity = 0.0
                     
                     similarities.append({
-                        'poem': poem,
+                        'item': poem,
                         'similarity': float(similarity)  # Convert to Python float
                     })
             

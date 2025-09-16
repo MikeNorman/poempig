@@ -314,6 +314,9 @@
                 allVibes = data.vibes || [];
                 filteredVibes = [...allVibes];
                 
+                // Sort by number of poems (descending)
+                filteredVibes.sort((a, b) => (b.poems?.length || 0) - (a.poems?.length || 0));
+                
                 updateStats();
                 displayVibes();
             } catch (error) {
@@ -388,6 +391,9 @@
                 });
             }
             
+            // Sort by number of poems (descending)
+            filteredVibes.sort((a, b) => (b.poems?.length || 0) - (a.poems?.length || 0));
+            
             displayVibes();
         }
         
@@ -404,8 +410,8 @@
         }
         
         function viewVibeProfile(vibeProfileId) {
-            // Navigate to the vibe match page with the vibe profile loaded
-            window.location.href = `/find_similar.html?vibe_profile_id=${vibeProfileId}`;
+            // Navigate to the vibe profile page
+            window.location.href = `/vibe-profile/${vibeProfileId}`;
         }
     </script>
 </body>

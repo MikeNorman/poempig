@@ -3,388 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vibe Profile - Poem Pig</title>
+    <title>Create Vibe - Poem Pig</title>
+    <link rel="stylesheet" href="/static/styles.css">
     <script>
         console.log('Page loaded at:', new Date().toISOString());
         console.log('JavaScript is working!');
         console.log('Script version:', 'v2.0');
     </script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Georgia', serif;
-            line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #4A90E2 0%, #7B68EE 50%, #9370DB 100%);
-            min-height: 100vh;
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .nav {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 15px 0;
-            margin-bottom: 30px;
-            border-radius: 15px;
-        }
-        
-        .nav-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-        }
-        
-        .nav-btn {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
-        
-        .nav-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            border-color: rgba(255, 255, 255, 0.5);
-            transform: translateY(-2px);
-        }
-        
-        .nav-btn.active {
-            background: rgba(255, 255, 255, 0.4);
-            border-color: rgba(255, 255, 255, 0.6);
-        }
-        
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            color: white;
-        }
-        
-        .header h1 {
-            font-size: 3rem;
-            margin-bottom: 10px;
-            text-shadow: 3px 3px 6px rgba(0,0,0,0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-        }
-        
-        .pig-icon {
-            font-size: 3rem;
-            animation: wiggle 2s ease-in-out infinite;
-        }
-        
-        @keyframes wiggle {
-            0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(-5deg); }
-            75% { transform: rotate(5deg); }
-        }
-        
-        .header p {
-            font-size: 1.2rem;
-            opacity: 0.95;
-            font-style: italic;
-        }
-        
-        .back-btn {
-            background: linear-gradient(135deg, #7B68EE 0%, #9370DB 100%);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 20px;
-        }
-        
-        .back-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-        
-        .main-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .vibe-seeds-container {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            border: 2px solid #4A90E2;
-            position: sticky;
-            top: 20px;
-            height: fit-content;
-            max-height: calc(100vh - 40px);
-            overflow-y: auto;
-        }
-        
-        .vibe-profile-name {
-            position: sticky;
-            top: 0;
-            background: white;
-            z-index: 10;
-            margin-bottom: 15px;
-        }
-        
-        .vibe-seeds-container h2 {
-            color: #4A90E2;
-            margin-bottom: 20px;
-            font-size: 1.5rem;
-            text-align: center;
-        }
-        
-        .vibe-profile-name {
-            background: transparent;
-            border: 2px solid #4A90E2;
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #4A90E2;
-            text-align: center;
-            width: 100%;
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
-        }
-        
-        .vibe-profile-name:focus {
-            outline: none;
-            border-color: #7B68EE;
-            background: rgba(74, 144, 226, 0.1);
-        }
-        
-        .vibe-profile-name:hover {
-            border-color: #7B68EE;
-        }
-        
-        .suggested-poems-container {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            border: 2px solid #7B68EE;
-            max-height: calc(100vh - 40px);
-            overflow-y: auto;
-        }
-        
-        .suggested-poems-title {
-            position: sticky;
-            top: 0;
-            background: white;
-            z-index: 10;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #7B68EE;
-        }
-        
-        .suggested-poems-container h2 {
-            color: #7B68EE;
-            margin-bottom: 20px;
-            font-size: 1.5rem;
-            text-align: center;
-        }
-        
-        .find-more-container {
-            text-align: center;
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid #e0e0e0;
-        }
-        
-        .find-more-btn {
-            background: linear-gradient(135deg, #7B68EE 0%, #9370DB 100%);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-        
-        .find-more-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-        }
-        
-        .find-more-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .poem-card {
-            border: 2px solid #7B68EE;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
-            background: #F0F8FF;
-        }
-        
-        .poem-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-            border-color: #4A90E2;
-        }
-        
-        .chosen-poem-card {
-            border: 3px solid #4A90E2;
-            background: #E6F3FF;
-        }
-        
-        .poem-title {
-            font-size: 1.05rem;
-            font-weight: bold;
-            color: #4A90E2;
-            margin-bottom: 7px;
-        }
-        
-        .poem-author {
-            color: #7B68EE;
-            font-style: italic;
-            margin-bottom: 10px;
-            font-size: 0.77rem;
-        }
-        
-        .poem-text {
-            white-space: pre-line;
-            line-height: 1.6;
-            color: #444;
-            margin-bottom: 12px;
-            font-size: 0.7rem;
-        }
-        
-        .poem-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.63rem;
-            color: #666;
-            gap: 10px;
-        }
-        
-        .poem-buttons {
-            display: flex;
-            gap: 8px;
-        }
-        
-        .same-vibe-btn {
-            color: white;
-            border: none;
-            padding: 7px 14px;
-            border-radius: 6px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: linear-gradient(135deg, #FF6B6B 0%, #FF8E8E 100%);
-        }
-        
-        .same-vibe-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        }
-        
-        .same-vibe-btn.added {
-            background: linear-gradient(135deg, #4A90E2 0%, #7B68EE 100%);
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 50px;
-            color: #4A90E2;
-            font-size: 1.2rem;
-        }
-        
-        .error {
-            background: #FFE4E1;
-            color: #8B0000;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border-left: 5px solid #8B0000;
-        }
-        
-        .loading {
-            color: #7B68EE;
-            text-align: center;
-            padding: 20px;
-            font-style: italic;
-        }
-        
-        /* Custom scrollbar styling */
-        .vibe-seeds-container::-webkit-scrollbar,
-        .suggested-poems-container::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .vibe-seeds-container::-webkit-scrollbar-track,
-        .suggested-poems-container::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 3px;
-        }
-        
-        .vibe-seeds-container::-webkit-scrollbar-thumb,
-        .suggested-poems-container::-webkit-scrollbar-thumb {
-            background: #4A90E2;
-            border-radius: 3px;
-        }
-        
-        .vibe-seeds-container::-webkit-scrollbar-thumb:hover,
-        .suggested-poems-container::-webkit-scrollbar-thumb:hover {
-            background: #357ABD;
-        }
-        
-        @media (max-width: 768px) {
-            .main-content {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-            
-            .header h1 {
-                font-size: 2rem;
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .vibe-seeds-container, .suggested-poems-container {
-                padding: 20px;
-            }
-        }
-    </style>
 </head>
 <body>
     <div class="container">
@@ -414,6 +39,25 @@
             </div>
             
             <div class="suggested-poems-container">
+                <!-- Keyword Search Trigger -->
+                <div class="keyword-search-trigger" style="margin-bottom: 20px;">
+                    <div class="keyword-search-form">
+                        <input type="text" id="keyword-search-input" class="keyword-search-input" placeholder="Search for keywords in title, author, or text...">
+                        <button class="keyword-search-btn" onclick="performKeywordSearch()">🔍 Search Keywords</button>
+                    </div>
+                </div>
+                
+                <!-- Keyword Search Results Section -->
+                <div id="keyword-search-container" class="keyword-search-container" style="display: none;">
+                    <div class="keyword-search-header">
+                        <h3 class="keyword-search-title">Keyword Search Results</h3>
+                        <button class="clear-keyword-search" onclick="clearKeywordSearch()">✕ Clear</button>
+                    </div>
+                    <div id="keyword-search-results" class="keyword-search-results">
+                        <!-- Keyword search results will be displayed here -->
+                    </div>
+                </div>
+                
                 <h2 class="suggested-poems-title">Suggested Poems</h2>
                 <div id="suggested-poems-content">
                     <div class="loading">Loading similar poems...</div>
@@ -445,6 +89,7 @@
             console.log('==================');
         }
         
+        const API_BASE_URL = 'http://localhost:5001';
         let vibeProfilePoems = new Set();
         let currentVibeProfileId = null;
         let currentVibeProfileName = 'Vibe Seed';
@@ -646,6 +291,7 @@
             const nameInput = document.getElementById('vibe-profile-name');
             const content = document.getElementById('vibe-seeds-content');
             
+            
             if (vibeProfilePoems.size === 0) {
                 content.innerHTML = '<div class="loading">🐷 Loading chosen poem...</div>';
                 return;
@@ -716,7 +362,7 @@
                         <div class="poem-meta">
                             <div class="poem-buttons">
                                 <button class="same-vibe-btn ${isInVibeProfile ? 'added' : ''}"
-                                        onclick="addToVibeProfile('${poem.id}', this)">
+                                        onclick="addToCurrentVibe('${poem.id}', this)">
                                     ${isInVibeProfile ? 'Added' : 'Add'}
                                 </button>
                             </div>
@@ -734,18 +380,15 @@
         }
         
         
-        async function addToVibeProfile(poemId, button) {
-            console.log('addToVibeProfile called with poemId:', poemId);
+        async function addToCurrentVibe(poemId, button) {
             
             if (vibeProfilePoems.has(poemId)) {
                 // Already in vibe profile, remove it
-                console.log('Removing poem from vibe profile');
                 vibeProfilePoems.delete(poemId);
                 button.textContent = 'Add';
                 button.classList.remove('added');
             } else {
                 // Add to vibe profile
-                console.log('Adding poem to vibe profile');
                 vibeProfilePoems.add(poemId);
                 button.textContent = 'Added';
                 button.classList.add('added');
@@ -931,6 +574,171 @@
         function goBack() {
             window.history.back();
         }
+        
+        // Keyword search functionality
+        async function performKeywordSearch() {
+            const input = document.getElementById('keyword-search-input');
+            const keywords = input.value.trim();
+            
+            if (!keywords) {
+                alert('Please enter keywords to search for');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/search-keywords`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ keywords })
+                });
+                
+                if (!response.ok) throw new Error('Search failed');
+                
+                const data = await response.json();
+                displayKeywordResults(data.results);
+                
+                // Show the keyword search container
+                document.getElementById('keyword-search-container').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Keyword search error:', error);
+                showError('Failed to search keywords: ' + error.message);
+            }
+        }
+        
+        function displayKeywordResults(results) {
+            const container = document.getElementById('keyword-search-results');
+            
+            if (!results || results.length === 0) {
+                container.innerHTML = '<div class="no-keyword-results">No items found matching your keywords</div>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            results.forEach(result => {
+                const item = result.item;
+                const card = document.createElement('div');
+                card.className = 'keyword-poem-card';
+                
+                card.innerHTML = `
+                    <div class="keyword-poem-title">${item.title || 'Untitled'}</div>
+                    <div class="keyword-poem-author">by ${item.author || 'Unknown'}</div>
+                    <div class="keyword-poem-text">${item.text}</div>
+                    <div class="keyword-poem-buttons">
+                        <button class="keyword-add-btn" onclick="addKeywordItemToVibe('${item.id}', this)">
+                            ➕ Add to Vibe
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+        
+        async function addKeywordItemToVibe(itemId, button) {
+            try {
+                button.textContent = 'Adding...';
+                button.disabled = true;
+                
+                // Add to current vibe profile if it exists, otherwise create new one
+                if (currentVibeProfileId) {
+                    const response = await fetch(`${API_BASE_URL}/add-to-vibe-profile`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            item_id: itemId,
+                            vibe_profile_id: currentVibeProfileId
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        button.textContent = 'Added!';
+                        button.classList.add('added');
+                        
+                        // Add to local set and update display
+                        vibeProfilePoems.add(itemId);
+                        displayVibeSeeds();
+                        
+                        // Navigate to vibe profile page after a longer delay to ensure DB is updated
+                        setTimeout(() => {
+                            window.location.href = `/vibe-profile/${currentVibeProfileId}`;
+                        }, 3000);
+                    } else {
+                        throw new Error('Failed to add to vibe profile');
+                    }
+                } else {
+                    // No vibe profile exists yet - add locally and auto-create vibe profile if we have 2+ items
+                    vibeProfilePoems.add(itemId);
+                    
+                    button.textContent = 'Added!';
+                    button.classList.add('added');
+                    
+                    // Update display
+                    displayVibeSeeds();
+                    
+                    // Auto-create vibe profile if we now have 2+ items
+                    if (vibeProfilePoems.size >= 2) {
+                        await createVibeProfileAutomatically();
+                    }
+                }
+                
+            } catch (error) {
+                console.error('Error adding item to vibe:', error);
+                button.textContent = 'Error';
+                button.disabled = false;
+                showError('Failed to add item to vibe: ' + error.message);
+            }
+        }
+        
+        function clearKeywordSearch() {
+            document.getElementById('keyword-search-container').style.display = 'none';
+            document.getElementById('keyword-search-input').value = '';
+            document.getElementById('keyword-search-results').innerHTML = '';
+        }
+        
+        async function createVibeProfileAutomatically() {
+            if (vibeProfilePoems.size < 2) {
+                return;
+            }
+            
+            try {
+                const allItemIds = Array.from(vibeProfilePoems);
+                const response = await fetch(`${API_BASE_URL}/create-vibe-profile`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: document.getElementById('vibe-profile-name').value || 'New Vibe',
+                        item_ids: allItemIds
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    currentVibeProfileId = data.vibe_profile_id;
+                    
+                    // Navigate to vibe profile page after a short delay
+                    setTimeout(() => {
+                        window.location.href = `/vibe-profile/${data.vibe_profile_id}`;
+                    }, 2000);
+                } else {
+                    throw new Error('Failed to create vibe profile');
+                }
+            } catch (error) {
+                console.error('Error creating vibe profile automatically:', error);
+                showError('Failed to create vibe profile: ' + error.message);
+            }
+        }
+        
+        // Allow Enter key to trigger search
+        document.addEventListener('DOMContentLoaded', () => {
+            const keywordInput = document.getElementById('keyword-search-input');
+            if (keywordInput) {
+                keywordInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        performKeywordSearch();
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>

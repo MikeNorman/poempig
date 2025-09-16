@@ -131,6 +131,18 @@ class ItemRecommendationEngine:
             print(f"Error in keyword search: {e}")
             return []
     
+    def search_by_keywords(self, keywords: str) -> List[Dict[str, Any]]:
+        """
+        Public method to search items by keywords.
+        
+        Args:
+            keywords (str): Keywords to search for
+            
+        Returns:
+            List[Dict]: List of matching items
+        """
+        return self._search_by_keywords(keywords)
+    
     def _search_by_semantic_similarity(self, query_text: str) -> List[Dict[str, Any]]:
         """
         Search poems using semantic similarity (structured tag-based matching).

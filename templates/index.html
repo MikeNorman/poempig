@@ -246,6 +246,11 @@
             padding: 20px;
             backdrop-filter: blur(10px);
             border: 2px solid #4A90E2;
+            order: 2; /* Position on the right */
+        }
+        
+        .poems-column {
+            order: 1; /* Position on the left */
         }
         
         .vibe-search-container {
@@ -659,21 +664,21 @@
         let allVibes = [];
         
         function toggleVibeSelection() {
-            isVibeSelectionMode = !isVibeSelectionMode;
             const vibeColumn = document.getElementById('vibe-selection-column');
             const selectBtn = document.getElementById('select-vibe-btn');
             
-            if (isVibeSelectionMode) {
+            if (vibeColumn.style.display === 'none' || vibeColumn.style.display === '') {
+                // Show vibe selection
                 vibeColumn.style.display = 'block';
-                selectBtn.textContent = 'Cancel';
+                selectBtn.textContent = 'Cancel Selection';
                 selectBtn.classList.add('active');
-                loadVibes();
+                loadVibeProfiles();
             } else {
+                // Hide vibe selection
                 vibeColumn.style.display = 'none';
                 selectBtn.textContent = 'Select Vibe';
                 selectBtn.classList.remove('active');
-                selectedPoemId = null;
-                updatePoemSelection();
+                window.pendingItemId = null;
             }
         }
         
@@ -727,7 +732,7 @@
                 html += `
                     <div class="vibe-item" onclick="addPoemToVibe('${vibe.id}')">
                         <div class="vibe-name">${vibe.name}</div>
-                        <div class="vibe-count">${vibe.size} poems</div>
+                        <div class="vibe-count">${vibe.poems ? vibe.poems.length : 0} poems</div>
                     </div>
                 `;
             });
@@ -744,9 +749,26 @@
             displayVibes(filteredVibes);
         }
         
+        async function loadVibeProfiles() {
+            try {
+                const response = await fetch('/vibe-profiles');
+                if (!response.ok) throw new Error('Failed to load vibe profiles');
+                
+                allVibes = await response.json();
+                displayVibes(allVibes);
+            } catch (error) {
+                console.error('Error loading vibe profiles:', error);
+                document.getElementById('vibe-list').innerHTML = 
+                    '<div class="error">❌ Error loading vibe profiles</div>';
+            }
+        }
+        
+        // Make loadVibeProfiles globally available
+        window.loadVibeProfiles = loadVibeProfiles;
+        
         async function addPoemToVibe(vibeId) {
-            console.log('addPoemToVibe called with vibeId:', vibeId, 'selectedPoemId:', selectedPoemId);
-            if (!selectedPoemId) {
+            console.log('addPoemToVibe called with vibeId:', vibeId, 'pendingItemId:', window.pendingItemId);
+            if (!window.pendingItemId) {
                 alert('Please select a poem first');
                 return;
             }
@@ -759,7 +781,7 @@
                     },
                     body: JSON.stringify({
                         vibe_profile_id: vibeId,
-                        item_id: selectedPoemId
+                        item_id: window.pendingItemId
                     })
                 });
                 
@@ -769,24 +791,23 @@
                     const vibeName = vibe ? vibe.name : 'Unknown';
                     
                     // Show success feedback
-                    const poemCard = document.querySelector(`[data-poem-id="${selectedPoemId}"]`);
-                    if (poemCard) {
-                        const button = poemCard.querySelector('.poem-meta .save-btn');
-                        if (button) {
-                            const originalText = button.textContent;
-                            button.textContent = `Added to ${vibeName}`;
-                            button.style.background = '#4CAF50';
-                            
-                            setTimeout(() => {
-                                button.textContent = originalText;
-                                button.style.background = '';
-                            }, 2000);
-                        }
+                    alert(`Poem added to "${vibeName}" vibe!`);
+                    
+                    // Hide the vibe selection column after successful addition
+                    const vibeColumn = document.getElementById('vibe-selection-column');
+                    if (vibeColumn) {
+                        vibeColumn.style.display = 'none';
                     }
                     
-                    // Clear selection
-                    selectedPoemId = null;
-                    updatePoemSelection();
+                    // Reset the button
+                    const selectBtn = document.getElementById('select-vibe-btn');
+                    if (selectBtn) {
+                        selectBtn.textContent = 'Select Vibe';
+                        selectBtn.classList.remove('active');
+                    }
+                    
+                    // Clear the pending item ID
+                    window.pendingItemId = null;
                     
                     // Refresh the vibe profiles to show updated counts
                     loadVibes();

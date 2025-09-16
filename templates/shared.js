@@ -91,7 +91,7 @@ function displayPoems(poems, containerId, options = {}) {
                 ${showActions ? `
                     <div class="actions">
                         ${onFindSimilar ? `
-                            <button class="btn btn-secondary" onclick="window.location.href='/find_similar.html?id=${poem.id}'">
+                            <button class="btn btn-secondary" onclick="window.location.href='/vibe-profile.html?seed_id=${poem.id}'">
                                 ✨ Create Vibe
                             </button>
                         ` : ''}
@@ -115,28 +115,30 @@ window.displayPoems = displayPoems;
 // Common add to vibe profile function
 async function addToVibeProfile(itemId, vibeProfileId = null) {
     try {
-        // If no vibe profile ID provided, show selection dialog
+        // If no vibe profile ID provided, show vibe selection column
         if (!vibeProfileId) {
-            const response = await makeRequest('/vibe-profiles', {}, 'GET');
-            const vibeProfiles = response || [];
+            // Store the item ID for when a vibe is selected
+            window.pendingItemId = itemId;
             
-            if (vibeProfiles.length === 0) {
-                showError('No vibe profiles available');
-                return;
+            // Show the vibe selection column
+            const vibeColumn = document.getElementById('vibe-selection-column');
+            if (vibeColumn) {
+                vibeColumn.style.display = 'block';
+                
+                // Update the button text to show it's active
+                const selectBtn = document.getElementById('select-vibe-btn');
+                if (selectBtn) {
+                    selectBtn.textContent = 'Cancel Selection';
+                    selectBtn.classList.add('active');
+                }
+                
+                // Load vibe profiles if not already loaded
+                const vibeList = document.getElementById('vibe-list');
+                if (vibeList.innerHTML.includes('Loading vibes...')) {
+                    window.loadVibeProfiles();
+                }
             }
-            
-            const vibeNames = vibeProfiles.map(v => v.name).join('\n');
-            const selection = prompt(`Select a vibe profile to add this poem to:\n\n${vibeNames}\n\nEnter the name:`);
-            
-            if (!selection) return;
-            
-            const selectedVibe = vibeProfiles.find(v => v.name.toLowerCase() === selection.toLowerCase());
-            if (!selectedVibe) {
-                showError('Vibe profile not found');
-                return;
-            }
-            
-            vibeProfileId = selectedVibe.id;
+            return;
         }
         
         const response = await makeRequest('/add-to-vibe-profile', {
@@ -146,6 +148,20 @@ async function addToVibeProfile(itemId, vibeProfileId = null) {
         
         if (response.success) {
             alert('Poem added to vibe profile successfully!');
+            
+            // Hide the vibe selection column after successful addition
+            const vibeColumn = document.getElementById('vibe-selection-column');
+            if (vibeColumn) {
+                vibeColumn.style.display = 'none';
+            }
+            
+            // Reset the button
+            const selectBtn = document.getElementById('select-vibe-btn');
+            if (selectBtn) {
+                selectBtn.textContent = 'Select Vibe';
+                selectBtn.classList.remove('active');
+            }
+            
             // Refresh vibe profiles if on a page that displays them
             if (typeof loadVibes === 'function') {
                 loadVibes();
