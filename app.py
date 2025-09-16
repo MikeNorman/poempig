@@ -2,21 +2,23 @@
 Flask Web Application for Poem Recommender
 """
 
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
+from flask_cors import CORS
 import os
 from dotenv import load_dotenv
-from src.recommendation_engine import PoemRecommendationEngine
 from src.vibe_profile_manager import VibeProfileManager                                                      
 
 # Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app)
 
 
-# Initialize recommendation engine
+# Initialize recommendation engine (lazy import to avoid heavy deps during simple runs)
 try:
-    engine = PoemRecommendationEngine()
+    from src.recommendation_engine import ItemRecommendationEngine
+    engine = ItemRecommendationEngine()
     print("✅ Recommendation engine initialized successfully")                                                      
 except Exception as e:
     print(f"❌ Error initializing recommendation engine: {e}")                                                      
@@ -32,8 +34,17 @@ except Exception as e:
 
 @app.route('/')
 def index():
-    """Main page with search interface."""
+    """Serve the template homepage as the default."""
     return render_template('index.html')
+
+@app.route('/static/<filename>')
+def static_files(filename):
+    """Serve static files from templates directory"""
+    return send_from_directory('templates', filename)
+
+## Removed redundant /old route; / now serves the template homepage
+
+# Removed unused React build serving - we only serve templates now
 
 @app.route('/find_similar.html')
 def find_similar_page():
@@ -47,153 +58,65 @@ def vibes_page():
 
 @app.route('/search', methods=['POST'])
 def search():
-    """Search for poems based on query."""
+    """Search for items (poems and quotes) based on query."""
     if not engine:
-        return jsonify({'error': 'Recommendation engine not available'}), 500                                       
-    
+        return jsonify({'error': 'Recommendation engine not available'}), 500
+
     try:
         data = request.get_json()
         query = data.get('query', '')
         top_k = int(data.get('top_k', 5))
         offset = int(data.get('offset', 0))
-        
+
         if not query.strip():
-            return jsonify({'error': 'Query cannot be empty'}), 400                                                 
-        
-        # Search for similar poems
-        results = engine.search_poems(query, top_k + offset)
-        
+            return jsonify({'error': 'Query cannot be empty'}), 400
+
+        # Search for similar items - get all results for pagination
+        all_results = engine.search_items(query)
+
         # Apply offset for pagination
         if offset > 0:
-            results = results[offset:]
-        
-        # Limit to requested top_k
+            results = all_results[offset:]
+        else:
+            results = all_results
+
+        # Limit to requested page size
         results = results[:top_k]
-        
+
+        # Format results to match frontend expectations
+        formatted_results = []
+        for result in results:
+            formatted_results.append({
+                'poem': result['item'],  # Frontend expects 'poem' key
+                'similarity': result['similarity']
+            })
+
         return jsonify({
             'query': query,
-            'results': results,
-            'count': len(results)
+            'results': formatted_results,
+            'count': len(formatted_results),
+            'total_available': len(all_results)
         })
-        
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/recommend/theme', methods=['POST'])
-def recommend_by_theme():
-    """Recommend poems by theme."""
-    if not engine:
-        return jsonify({'error': 'Recommendation engine not available'}), 500
-    
-    try:
-        data = request.get_json()
-        theme = data.get('theme', '')
-        top_k = int(data.get('top_k', 5))
-        
-        if not theme.strip():
-            return jsonify({'error': 'Theme cannot be empty'}), 400
-        
-        results = engine.recommend_by_theme(theme, top_k)
-        
-        return jsonify({
-            'theme': theme,
-            'results': results,
-            'count': len(results)
-        })
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
-@app.route('/recommend/mood', methods=['POST'])
-def recommend_by_mood():
-    """Recommend poems by mood."""
+@app.route('/item/<item_id>')
+def get_item(item_id):
+    """Get a specific item by ID."""
     if not engine:
         return jsonify({'error': 'Recommendation engine not available'}), 500
-    
-    try:
-        data = request.get_json()
-        mood = data.get('mood', '')
-        top_k = int(data.get('top_k', 5))
-        
-        if not mood.strip():
-            return jsonify({'error': 'Mood cannot be empty'}), 400
-        
-        results = engine.recommend_by_mood(mood, top_k)
-        
-        return jsonify({
-            'mood': mood,
-            'results': results,
-            'count': len(results)
-        })
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
-@app.route('/recommend/author', methods=['POST'])
-def recommend_by_author():
-    """Recommend poems by author."""
-    if not engine:
-        return jsonify({'error': 'Recommendation engine not available'}), 500
-    
     try:
-        data = request.get_json()
-        author = data.get('author', '')
-        top_k = int(data.get('top_k', 5))
-        
-        if not author.strip():
-            return jsonify({'error': 'Author cannot be empty'}), 400
-        
-        results = engine.recommend_by_author(author, top_k)
-        
-        return jsonify({
-            'author': author,
-            'results': results,
-            'count': len(results)
-        })
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/poem/<poem_id>')
-def get_poem(poem_id):
-    """Get a specific poem by ID."""
-    if not engine:
-        return jsonify({'error': 'Recommendation engine not available'}), 500
-    
-    try:
-        poem = engine.get_poem_by_id(poem_id)
-        if poem:
-            return jsonify(poem)
+        item = engine.get_item_by_id(item_id)
+        if item:
+            return jsonify(item)
         else:
-            return jsonify({'error': 'Poem not found'}), 404
+            return jsonify({'error': 'Item not found'}), 404
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/find-similar', methods=['POST'])
-def find_similar():
-    """Find similar poems based on a specific poem ID."""
-    if not engine:
-        return jsonify({'error': 'Recommendation engine not available'}), 500
-    
-    try:
-        data = request.get_json()
-        poem_id = data.get('poem_id', '')
-        top_k = int(data.get('top_k', 5))
-        exclude_poem_ids = data.get('exclude_poem_ids', [])  # New parameter for exclusion
-        
-        if not poem_id.strip():
-            return jsonify({'error': 'Poem ID cannot be empty'}), 400
-        
-        results = engine.find_similar_by_poem_id(poem_id, top_k, exclude_poem_ids)
-        
-        return jsonify({
-            'poem_id': poem_id,
-            'results': results,
-            'count': len(results)
-        })
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
 @app.route('/create-vibe-profile', methods=['POST'])
 def create_vibe_profile():
@@ -204,9 +127,9 @@ def create_vibe_profile():
     try:
         data = request.get_json()
         name = data.get('name', 'Untitled Vibe Profile')
-        poem_ids = data.get('poem_ids', [])
+        item_ids = data.get('item_ids', [])
         
-        vibe_profile_id = vibe_manager.create_vibe_profile(name, poem_ids)
+        vibe_profile_id = vibe_manager.create_vibe_profile(name, item_ids)
         
         if vibe_profile_id:
             return jsonify({
@@ -227,20 +150,54 @@ def add_to_vibe_profile():
     
     try:
         data = request.get_json()
-        poem_id = data.get('poem_id', '')
+        item_id = data.get('item_id', '')
         vibe_profile_id = data.get('vibe_profile_id', '')
         similarity_score = data.get('similarity_score')
         
-        if not poem_id or not vibe_profile_id:
-            return jsonify({'error': 'Poem ID and Vibe Profile ID are required'}), 400
+        if not item_id or not vibe_profile_id:
+            return jsonify({'error': 'Item ID and Vibe Profile ID are required'}), 400
         
-        success = vibe_manager.assign_item_to_vibe_profile(poem_id, vibe_profile_id, similarity_score)
+        success = vibe_manager.assign_item_to_vibe_profile(item_id, vibe_profile_id, similarity_score)
         
         if success:
             return jsonify({'success': True})
         else:
             return jsonify({'error': 'Failed to add poem to vibe profile'}), 500
             
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/find-similar', methods=['POST'])
+def find_similar():
+    """Find similar items to a single item."""
+    if not engine:
+        return jsonify({'error': 'Recommendation engine not available'}), 500
+    
+    try:
+        data = request.get_json()
+        item_id = data.get('item_id', '')
+        top_k = int(data.get('top_k', 5))
+        
+        if not item_id:
+            return jsonify({'error': 'Item ID is required'}), 400
+        
+        # Get the item first
+        item = engine.get_item_by_id(item_id)
+        if not item:
+            return jsonify({'error': 'Item not found'}), 404
+        
+        # Find similar items using the item's text
+        similar_items = engine.search_items(item.get('text', ''))
+        
+        # Filter out the original item
+        similar_items = [result for result in similar_items if result['item']['id'] != item_id]
+        
+        return jsonify({
+            'item_id': item_id,
+            'results': similar_items[:top_k],
+            'count': len(similar_items[:top_k])
+        })
+        
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -254,12 +211,12 @@ def find_similar_to_vibe_profile():
         data = request.get_json()
         vibe_profile_id = data.get('vibe_profile_id', '')
         top_k = int(data.get('top_k', 5))
-        exclude_poem_ids = data.get('exclude_poem_ids', [])
+        exclude_item_ids = data.get('exclude_item_ids', [])
         
         if not vibe_profile_id:
             return jsonify({'error': 'Vibe Profile ID is required'}), 400
         
-        results = vibe_manager.find_similar_to_vibe_profile(vibe_profile_id, top_k, exclude_poem_ids)
+        results = vibe_manager.find_similar_to_vibe_profile(vibe_profile_id, top_k, exclude_item_ids)
         
         return jsonify({
             'vibe_profile_id': vibe_profile_id,
@@ -322,6 +279,51 @@ def get_vibe_profile(vibe_profile_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/vibe-profiles', methods=['GET'])
+def get_vibe_profiles():
+    """Get all vibe profiles."""
+    if not vibe_manager:
+        return jsonify({'error': 'Vibe profile manager not available'}), 500
+    
+    try:
+        profiles = vibe_manager.get_all_vibe_profiles_with_poems()
+        return jsonify(profiles)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/vibe-profile/<vibe_profile_id>')
+def vibe_profile_page(vibe_profile_id):
+    """Individual vibe profile page with side-by-side container UX"""
+    try:
+        # Get the vibe profile data directly
+        vibe_profile = vibe_manager.get_vibe_profile_with_poems(vibe_profile_id)
+        
+        if not vibe_profile:
+            return render_template('error.html', 
+                                 error_title="Vibe Profile Not Found",
+                                 error_message="The requested vibe profile could not be found."), 404
+            
+        return render_template('vibe_profile.html', vibe_profile=vibe_profile)
+    except Exception as e:
+        return render_template('error.html',
+                             error_title="Error Loading Vibe Profile", 
+                             error_message=f"An error occurred while loading the vibe profile: {str(e)}"), 500
+
+@app.route('/delete-vibe-profile/<vibe_profile_id>', methods=['DELETE'])
+def delete_vibe_profile(vibe_profile_id):
+    """Delete a vibe profile and all its associated items."""
+    if not vibe_manager:
+        return jsonify({'error': 'Vibe profile manager not available'}), 500
+    
+    try:
+        success = vibe_manager.delete_vibe_profile(vibe_profile_id)
+        if success:
+            return jsonify({'message': f'Vibe profile {vibe_profile_id} deleted successfully'}), 200
+        else:
+            return jsonify({'error': f'Failed to delete vibe profile {vibe_profile_id}'}), 500
+    except Exception as e:
+        return jsonify({'error': f'Error deleting vibe profile: {str(e)}'}), 500
+
 @app.route('/health')
 def health():
     """Health check endpoint."""
@@ -333,10 +335,11 @@ def health():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5001))
-    debug = os.environ.get('DEBUG', 'False').lower() == 'true'
+    debug = os.environ.get('DEBUG', 'True').lower() == 'true'  # Default to True for auto-reload
     
     print(f"🚀 Starting Flask app on port {port}")
-    print(f"🔧 Debug mode: {debug}")
+    print(f"🔧 Debug mode: {debug} (auto-reload enabled)")
     print(f"🌐 Open http://localhost:{port} in your browser")
+    print(f"🔄 Code changes will automatically restart the server")
     
     app.run(host='0.0.0.0', port=port, debug=debug)

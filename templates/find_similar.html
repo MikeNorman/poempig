@@ -461,14 +461,15 @@
             setupVibeProfileNameEditor();
         } else if (poemId) {
             // Load poem and find similar
+            console.log('Loading poem and finding similar for poemId:', poemId);
             loadChosenPoem();
             loadSimilarPoems(); // This will load in background
             setupVibeProfileNameEditor();
         } else {
             document.getElementById('vibe-seeds-content').innerHTML = 
-                '<div class="error">❌ No poem ID or vibe profile ID provided</div>';
+                '<div class="error">❌ No item ID or vibe profile ID provided</div>';
             document.getElementById('suggested-poems-content').innerHTML = 
-                '<div class="error">❌ Cannot find similar poems</div>';
+                '<div class="error">❌ Cannot find similar items</div>';
         }
         
         function generateVibeProfileName() {
@@ -598,9 +599,9 @@
         
         async function loadChosenPoem() {
             try {
-                const response = await fetch(`/poem/${poemId}`);
+                const response = await fetch(`/item/${poemId}`);
                 if (!response.ok) {
-                    throw new Error('Poem not found');
+                    throw new Error('Item not found');
                 }
                 
                 const poem = await response.json();
@@ -608,30 +609,36 @@
                 displayVibeSeeds();
             } catch (error) {
                 document.getElementById('vibe-seeds-content').innerHTML = 
-                    `<div class="error">❌ Error loading poem: ${error.message}</div>`;
+                    `<div class="error">❌ Error loading item: ${error.message}</div>`;
             }
         }
         
         async function loadSimilarPoems() {
+            console.log('loadSimilarPoems called with poemId:', poemId);
             try {
                 const response = await fetch('/find-similar', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ poem_id: poemId, top_k: 5 })
+                    body: JSON.stringify({ item_id: poemId, top_k: 5 })
                 });
+                
+                console.log('API response status:', response.status);
                 
                 if (!response.ok) {
                     const error = await response.json();
+                    console.error('API error:', error);
                     throw new Error(error.error || 'Failed to find similar poems');
                 }
                 
                 const result = await response.json();
+                console.log('API result:', result);
                 displaySuggestedPoems(result.results);
             } catch (error) {
+                console.error('Error in loadSimilarPoems:', error);
                 document.getElementById('suggested-poems-content').innerHTML = 
-                    `<div class="error">❌ Error finding similar poems: ${error.message}</div>`;
+                    `<div class="error">❌ Error finding similar items: ${error.message}</div>`;
             }
         }
         
@@ -651,7 +658,7 @@
             const poems = [];
             for (const poemId of vibeProfilePoems) {
                 try {
-                    const response = await fetch(`/poem/${poemId}`);
+                    const response = await fetch(`/item/${poemId}`);
                     if (response.ok) {
                         const poem = await response.json();
                         poems.push(poem);
@@ -692,8 +699,8 @@
             
             let html = '';
             poems.forEach((result) => {
-                // The API returns {poem: {...}, similarity: ...}
-                const poem = result.poem;
+                // The API returns {item: {...}, similarity: ...}
+                const poem = result.item;
                 if (!poem) return;
                 
                 // Track this poem as displayed
@@ -799,7 +806,7 @@
                         },
                         body: JSON.stringify({ 
                             name: generatedName,
-                            poem_ids: Array.from(vibeProfilePoems)
+                            item_ids: Array.from(vibeProfilePoems)
                         })
                     });
                     
@@ -836,7 +843,7 @@
                                 'Content-Type': 'application/json',
                             },
                             body: JSON.stringify({ 
-                                poem_id: poemId, 
+                                item_id: poemId, 
                                 vibe_profile_id: currentVibeProfileId 
                             })
                         });
@@ -882,7 +889,7 @@
                         body: JSON.stringify({ 
                             vibe_profile_id: currentVibeProfileId, 
                             top_k: 5,
-                            exclude_poem_ids: Array.from(displayedPoemIds)
+                            exclude_item_ids: Array.from(displayedPoemIds)
                         })
                     });
                 } else {
@@ -894,9 +901,9 @@
                             'Content-Type': 'application/json',
                         },
                         body: JSON.stringify({ 
-                            poem_id: poemId, 
+                            item_id: poemId, 
                             top_k: 5,
-                            exclude_poem_ids: Array.from(new Set([...vibeProfilePoems, ...displayedPoemIds]))
+                            exclude_item_ids: Array.from(new Set([...vibeProfilePoems, ...displayedPoemIds]))
                         })
                     });
                 }

@@ -9,7 +9,7 @@ ALTER TABLE poems ADD COLUMN IF NOT EXISTS embedding_vector vector(1536);
 CREATE INDEX IF NOT EXISTS poems_embedding_vector_idx ON poems USING ivfflat (embedding_vector vector_cosine_ops);
 
 -- Create a function to find similar poems using vector similarity
-CREATE OR REPLACE FUNCTION match_poems(
+CREATE OR REPLACE FUNCTION match_items(
     query_embedding vector(1536),
     match_threshold float DEFAULT 0.0,
     match_count int DEFAULT 5

@@ -241,10 +241,11 @@
         
         .vibe-selection-column {
             width: 300px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 15px;
             padding: 20px;
             backdrop-filter: blur(10px);
+            border: 2px solid #4A90E2;
         }
         
         .vibe-search-container {
@@ -254,15 +255,15 @@
         .vibe-search-container input {
             width: 100%;
             padding: 10px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            border: 2px solid #4A90E2;
             border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
+            background: white;
+            color: #333;
             font-size: 14px;
         }
         
         .vibe-search-container input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
+            color: #999;
         }
         
         .vibe-list {
@@ -271,7 +272,7 @@
         }
         
         .vibe-item {
-            background: rgba(255, 255, 255, 0.1);
+            background: #f8f9fa;
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 10px;
@@ -281,24 +282,25 @@
         }
         
         .vibe-item:hover {
-            background: rgba(255, 255, 255, 0.2);
+            background: #e9ecef;
             transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         
         .vibe-item.selected {
             border-color: #7B68EE;
-            background: rgba(123, 104, 238, 0.2);
+            background: rgba(123, 104, 238, 0.1);
         }
         
         .vibe-name {
             font-weight: bold;
-            color: white;
+            color: #333;
             margin-bottom: 5px;
         }
         
         .vibe-count {
             font-size: 12px;
-            color: rgba(255, 255, 255, 0.7);
+            color: #666;
         }
         
         .poem-card.selected {
@@ -377,6 +379,37 @@
         
         .save-btn.saved {
             background: linear-gradient(135deg, #4A90E2 0%, #7B68EE 100%);
+        }
+        
+        /* CSS for shared displayPoems function */
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #228B22 0%, #32CD32 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #7B68EE 0%, #9370DB 100%);
         }
         
         .load-more-btn {
@@ -483,6 +516,7 @@
             }
         }
     </style>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E">
 </head>
 <body>
     <div class="container">
@@ -510,7 +544,7 @@
                         placeholder="Describe what you want... Use quotes for exact phrases like &quot;roses are red&quot; or &quot;winter snow&quot;"
                     ></textarea>
                 </div>
-                <button type="submit" class="search-btn">🐷 Sniff Out Poems</button>
+                <button type="submit" class="search-btn">🐷 Root Out Poems</button>
             </form>
         </div>
         
@@ -525,7 +559,7 @@
                 <div class="poems-column">
                     <div id="results-content"></div>
                     <button id="load-more-btn" class="load-more-btn" style="display: none;" onclick="loadMorePoems()">
-                        Get 5 More Poems
+                        Find 5 More
                     </button>
                 </div>
                 <div id="vibe-selection-column" class="vibe-selection-column" style="display: none;">
@@ -553,24 +587,23 @@
         </div>
     </div>
     
+    <script src="/static/shared.js"></script>
     <script>
         let currentQuery = '';
         let currentOffset = 0;
         let allResults = [];
         let displayedResults = [];
+        let totalAvailable = 0;
         
-        function showLoading() {
+        function startLoading() {
             const resultsDiv = document.getElementById('results');
-            const contentDiv = document.getElementById('results-content');
-            
             resultsDiv.style.display = 'block';
-            contentDiv.innerHTML = '<div class="loading">🐷 Sniffing through poems...</div>';
+            window.showLoading('results-content', '🐷 Rooting through poems...');
         }
         
         function showError(message) {
             const resultsDiv = document.getElementById('results');
             const contentDiv = document.getElementById('results-content');
-            
             resultsDiv.style.display = 'block';
             contentDiv.innerHTML = `<div class="error">❌ ${message}</div>`;
         }
@@ -600,29 +633,16 @@
                 currentOffset = results.length;
             }
             
-            let html = '';
-            displayedResults.forEach((result, index) => {
-                const poem = result.poem || result;
-                
-                html += `
-                    <div class="poem-card" data-poem-id="${poem.id}" onclick="selectPoem('${poem.id}')">
-                        <div class="poem-title">${poem.title || 'Untitled'}</div>
-                        <div class="poem-author">by ${poem.author || 'Unknown'}</div>
-                        <div class="poem-text">${poem.text}</div>
-                        <div class="poem-meta">
-                            <button class="save-btn" 
-                                    onclick="event.stopPropagation(); findSimilar('${poem.id}')">
-                                Find Similar
-                            </button>
-                        </div>
-                    </div>
-                `;
+            // Use the shared displayPoems function with both buttons
+            window.displayPoems(displayedResults, 'results-content', {
+                showSimilarity: false,
+                showActions: true,
+                onFindSimilar: true,
+                onAddToVibe: true
             });
             
-            contentDiv.innerHTML = html;
-            
             // Show/hide load more button
-            if (displayedResults.length >= 10) {
+            if (displayedResults.length >= 5 && displayedResults.length < totalAvailable) {
                 loadMoreBtn.style.display = 'block';
             } else {
                 loadMoreBtn.style.display = 'none';
@@ -676,19 +696,26 @@
         }
         
         async function loadVibes() {
+            console.log('Loading vibes...');
             try {
                 const response = await fetch('/get-all-vibe-profiles');
+                console.log('Response status:', response.status);
                 const data = await response.json();
+                console.log('Vibes data:', data);
                 allVibes = data.vibes || [];
+                console.log('All vibes:', allVibes);
                 displayVibes(allVibes);
             } catch (error) {
                 console.error('Error loading vibes:', error);
-                document.getElementById('vibe-list').innerHTML = '<div class="error">Error loading vibes</div>';
+                document.getElementById('vibe-list').innerHTML = '<div class="error">Error loading vibes: ' + error.message + '</div>';
             }
         }
         
         function displayVibes(vibes) {
+            console.log('Displaying vibes:', vibes);
             const vibeList = document.getElementById('vibe-list');
+            console.log('Vibe list element:', vibeList);
+            
             if (vibes.length === 0) {
                 vibeList.innerHTML = '<div class="no-vibes">No vibes found. Create one first!</div>';
                 return;
@@ -696,6 +723,7 @@
             
             let html = '';
             vibes.forEach(vibe => {
+                console.log('Processing vibe:', vibe);
                 html += `
                     <div class="vibe-item" onclick="addPoemToVibe('${vibe.id}')">
                         <div class="vibe-name">${vibe.name}</div>
@@ -703,7 +731,9 @@
                     </div>
                 `;
             });
+            console.log('Generated HTML:', html);
             vibeList.innerHTML = html;
+            console.log('Vibe list innerHTML set');
         }
         
         function searchVibes() {
@@ -715,6 +745,7 @@
         }
         
         async function addPoemToVibe(vibeId) {
+            console.log('addPoemToVibe called with vibeId:', vibeId, 'selectedPoemId:', selectedPoemId);
             if (!selectedPoemId) {
                 alert('Please select a poem first');
                 return;
@@ -728,7 +759,7 @@
                     },
                     body: JSON.stringify({
                         vibe_profile_id: vibeId,
-                        poem_id: selectedPoemId
+                        item_id: selectedPoemId
                     })
                 });
                 
@@ -740,19 +771,25 @@
                     // Show success feedback
                     const poemCard = document.querySelector(`[data-poem-id="${selectedPoemId}"]`);
                     if (poemCard) {
-                        const originalText = poemCard.querySelector('.poem-meta button').textContent;
-                        poemCard.querySelector('.poem-meta button').textContent = `Added to ${vibeName}`;
-                        poemCard.querySelector('.poem-meta button').style.background = '#4CAF50';
-                        
-                        setTimeout(() => {
-                            poemCard.querySelector('.poem-meta button').textContent = originalText;
-                            poemCard.querySelector('.poem-meta button').style.background = '';
-                        }, 2000);
+                        const button = poemCard.querySelector('.poem-meta .save-btn');
+                        if (button) {
+                            const originalText = button.textContent;
+                            button.textContent = `Added to ${vibeName}`;
+                            button.style.background = '#4CAF50';
+                            
+                            setTimeout(() => {
+                                button.textContent = originalText;
+                                button.style.background = '';
+                            }, 2000);
+                        }
                     }
                     
                     // Clear selection
                     selectedPoemId = null;
                     updatePoemSelection();
+                    
+                    // Refresh the vibe profiles to show updated counts
+                    loadVibes();
                 } else {
                     alert('Error adding poem to vibe');
                 }
@@ -762,30 +799,11 @@
             }
         }
         
-        async function makeRequest(url, data) {
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
-                });
-                
-                if (!response.ok) {
-                    const error = await response.json();
-                    throw new Error(error.error || 'Request failed');
-                }
-                
-                return await response.json();
-            } catch (error) {
-                throw error;
-            }
-        }
+        // Using shared makeRequest function
         
         async function searchPoems(event) {
             event.preventDefault();
-            showLoading();
+            startLoading();
             
             const query = document.getElementById('search-query').value.trim();
             
@@ -798,11 +816,12 @@
             currentOffset = 0;
             
             try {
-                const result = await makeRequest('/search', {
+                const result = await window.makeRequest('/search', {
                     query: query,
                     top_k: 5
                 });
                 
+                totalAvailable = result.total_available || result.results.length;
                 showResults(result.results, `Poems found for "${query}"`);
             } catch (error) {
                 showError(error.message);

@@ -39,7 +39,7 @@ WITH (m = 16, ef_construction = 64);
 
 ```sql
 -- Create function for vector similarity search
-CREATE OR REPLACE FUNCTION match_poems(
+CREATE OR REPLACE FUNCTION match_items(
     query_embedding vector(1536),
     match_threshold float DEFAULT 0.0,
     match_count int DEFAULT 5
@@ -88,7 +88,7 @@ $$;
 
 ```sql
 -- Test the vector search function
-SELECT * FROM match_poems(
+SELECT * FROM match_items(
     (SELECT embedding_vector FROM poems LIMIT 1),
     0.0,
     5

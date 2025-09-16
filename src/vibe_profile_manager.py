@@ -4,6 +4,7 @@ Simple Vibe Profile Manager for assigning items to vibe profiles.
 
 import os
 import json
+import math
 import numpy as np
 from typing import List, Dict, Any, Optional
 from supabase import create_client
@@ -69,7 +70,7 @@ class VibeProfileManager:
     def get_items_for_vibe_profile(self, vibe_profile_id: str) -> List[Dict[str, Any]]:
         """Get all items for a vibe profile."""
         try:
-            result = self.supabase.table('vibe_profile_items').select('*, poems(*)').eq('vibe_profile_id', vibe_profile_id).execute()
+            result = self.supabase.table('vibe_profile_items').select('*, items(*)').eq('vibe_profile_id', vibe_profile_id).execute()
             return result.data or []
         except Exception as e:
             print(f"Error getting items for vibe profile: {e}")
@@ -115,7 +116,7 @@ class VibeProfileManager:
         except Exception as e:
             print(f"Error updating vibe profile size: {e}")
     
-    def create_vibe_profile(self, name: str, poem_ids: List[str] = None) -> Optional[str]:
+    def create_vibe_profile(self, name: str, item_ids: List[str] = None) -> Optional[str]:
         """Create a new vibe profile."""
         try:
             # Check if a vibe profile with this name already exists
@@ -124,10 +125,10 @@ class VibeProfileManager:
                 print(f"Vibe profile with name '{name}' already exists")
                 return existing.data[0]['id']  # Return existing ID
             
-            # If poem_ids are provided, check for content duplicates
-            if poem_ids:
-                # Check if there's already a vibe profile with the exact same set of poems
-                existing_content = self._find_vibe_profile_with_poems(poem_ids)
+            # If item_ids are provided, check for content duplicates
+            if item_ids:
+                # Check if there's already a vibe profile with the exact same set of items
+                existing_content = self._find_vibe_profile_with_items(item_ids)
                 if existing_content:
                     print(f"Vibe profile with the same content already exists: {existing_content['name']}")
                     return existing_content['id']  # Return existing ID
@@ -142,13 +143,20 @@ class VibeProfileManager:
             }).execute()
             
             if result.data:
-                return result.data[0]['id']
+                vibe_profile_id = result.data[0]['id']
+                
+                # Add items to the vibe profile if provided
+                if item_ids:
+                    for item_id in item_ids:
+                        self.assign_item_to_vibe_profile(item_id, vibe_profile_id)
+                
+                return vibe_profile_id
             return None
         except Exception as e:
             print(f"Error creating vibe profile: {e}")
             return None
     
-    def _find_vibe_profile_with_poems(self, poem_ids: List[str]) -> Optional[Dict[str, Any]]:
+    def _find_vibe_profile_with_items(self, item_ids: List[str]) -> Optional[Dict[str, Any]]:
         """Find a vibe profile that contains exactly the same set of poems."""
         try:
             # Get all vibe profiles
@@ -157,27 +165,27 @@ class VibeProfileManager:
             if not profiles_result.data:
                 return None
             
-            # Sort the input poem_ids for comparison
-            sorted_input_ids = sorted(poem_ids)
+            # Sort the input item_ids for comparison
+            sorted_input_ids = sorted(item_ids)
             
             for profile in profiles_result.data:
-                # Get poems for this vibe profile
-                poems = self.get_items_for_vibe_profile(profile['id'])
-                profile_poem_ids = []
+                # Get items for this vibe profile
+                items = self.get_items_for_vibe_profile(profile['id'])
+                profile_item_ids = []
                 
-                for item in poems:
-                    poem = item.get('poems')
-                    if poem and poem.get('id'):
-                        profile_poem_ids.append(poem['id'])
+                for item in items:
+                    item_data = item.get('items')
+                    if item_data and item_data.get('id'):
+                        profile_item_ids.append(item_data['id'])
                 
                 # Sort and compare
-                sorted_profile_ids = sorted(profile_poem_ids)
+                sorted_profile_ids = sorted(profile_item_ids)
                 
                 if sorted_input_ids == sorted_profile_ids:
                     return {
                         'id': profile['id'],
                         'name': profile['name'],
-                        'size': len(profile_poem_ids)
+                        'size': len(profile_item_ids)
                     }
             
             return None
@@ -198,7 +206,7 @@ class VibeProfileManager:
             # Extract embeddings
             embeddings = []
             for item in items:
-                poem = item.get('poems')
+                poem = item.get('items')
                 if poem and poem.get('embedding'):
                     if isinstance(poem['embedding'], str):
                         embedding = json.loads(poem['embedding'])
@@ -272,7 +280,7 @@ class VibeProfileManager:
                 poem_data = []
                 
                 for item in poems:
-                    poem = item.get('poems')
+                    poem = item.get('items')
                     if poem:
                         poem_data.append({
                             'id': poem['id'],
@@ -312,7 +320,7 @@ class VibeProfileManager:
             poem_data = []
             
             for item in poems:
-                poem = item.get('poems')
+                poem = item.get('items')
                 if poem:
                     poem_data.append({
                         'id': poem['id'],
@@ -333,7 +341,7 @@ class VibeProfileManager:
             print(f"Error getting vibe profile with poems: {e}")
             return None
     
-    def find_similar_to_vibe_profile(self, vibe_profile_id: str, top_k: int = 5, exclude_poem_ids: List[str] = None) -> List[Dict[str, Any]]:
+    def find_similar_to_vibe_profile(self, vibe_profile_id: str, top_k: int = 5, exclude_item_ids: List[str] = None) -> List[Dict[str, Any]]:
         """Find poems similar to a vibe profile's vector, excluding poems already in the profile and additional exclusions."""
         try:
             # Get the vibe profile vector
@@ -350,11 +358,11 @@ class VibeProfileManager:
             
             # Get poems already in this vibe profile to exclude them
             existing_items_result = self.supabase.table('vibe_profile_items').select('item_id').eq('vibe_profile_id', vibe_profile_id).execute()
-            existing_poem_ids = {item['item_id'] for item in (existing_items_result.data or [])}
+            existing_item_ids = {item['item_id'] for item in (existing_items_result.data or [])}
             
-            # Add additional poems to exclude (e.g., already displayed poems)
-            if exclude_poem_ids:
-                existing_poem_ids.update(exclude_poem_ids)
+            # Add additional items to exclude (e.g., already displayed items)
+            if exclude_item_ids:
+                existing_item_ids.update(exclude_item_ids)
             
             # Use Supabase vector similarity search for accurate and fast results
             try:
@@ -365,28 +373,47 @@ class VibeProfileManager:
                 vector_str = json.dumps(vector)
                 
                 # Use Supabase's built-in vector similarity search
-                poems_result = self.supabase.rpc('match_poems', {
-                    'q': vector_str,  # Use 'q' parameter as expected by the function
+                print(f"VIBE PROFILE DEBUG: Calling match_items with vector_str length: {len(vector_str)}")
+                print(f"VIBE PROFILE DEBUG: Vector preview: {vector_str[:100]}...")
+                
+                poems_result = self.supabase.rpc('match_items', {
+                    'q': vector_str,  # Use 'q' parameter as expected by the deployed function
                     'match_count': 50  # Get more than we need to account for exclusions
                 }).execute()
                 
+                print(f"VIBE PROFILE DEBUG: Raw result from Supabase: {poems_result}")
+                print(f"VIBE PROFILE DEBUG: Result data type: {type(poems_result.data)}")
+                print(f"VIBE PROFILE DEBUG: Result data length: {len(poems_result.data) if poems_result.data else 0}")
+                
                 if not poems_result.data:
                     print("No results from vector search, falling back to manual calculation")
-                    return self._manual_similarity_search(vector, existing_poem_ids, top_k)
+                    return self._manual_similarity_search(vector, existing_item_ids, top_k)
                 
                 # Filter out poems that are already in the vibe profile or in the exclusion list
-                available_poems = [poem for poem in poems_result.data if poem['id'] not in existing_poem_ids]
+                available_poems = [poem for poem in poems_result.data if poem['id'] not in existing_item_ids]
                 
                 if not available_poems:
                     print("No available poems after filtering, falling back to manual calculation")
-                    return self._manual_similarity_search(vector, existing_poem_ids, top_k)
+                    return self._manual_similarity_search(vector, existing_item_ids, top_k)
                 
                 # Convert to our expected format
                 similarities = []
                 for poem in available_poems:
+                    similarity = poem.get('similarity', 0.0)
+                    # Ensure similarity is a valid number
+                    if similarity is None:
+                        similarity = 0.0
+                    else:
+                        try:
+                            similarity = float(similarity)
+                            if math.isnan(similarity) or math.isinf(similarity):
+                                similarity = 0.0
+                        except (ValueError, TypeError):
+                            similarity = 0.0
+                    
                     similarities.append({
                         'poem': poem,
-                        'similarity': float(poem.get('similarity', 0.0))
+                        'similarity': similarity
                     })
                 
                 # Sort by similarity and return top_k
@@ -396,23 +423,23 @@ class VibeProfileManager:
             except Exception as e:
                 print(f"Vector search failed, falling back to manual calculation: {e}")
                 # Fallback to the original method if vector search fails
-                return self._manual_similarity_search(vector, existing_poem_ids, top_k)
+                return self._manual_similarity_search(vector, existing_item_ids, top_k)
             
         except Exception as e:
             print(f"Error finding similar to vibe profile: {e}")
             return []
     
-    def _manual_similarity_search(self, vector, existing_poem_ids, top_k):
+    def _manual_similarity_search(self, vector, existing_item_ids, top_k):
         """Fallback method for similarity search when vector search is not available."""
         try:
             # Get all poems with embeddings
-            poems_result = self.supabase.table('poems').select('*').not_.is_('embedding', 'null').execute()
+            poems_result = self.supabase.table('items').select('*').not_.is_('embedding', 'null').execute()
             
             if not poems_result.data:
                 return []
             
-            # Filter out poems that are already in the vibe profile or in the exclusion list
-            available_poems = [poem for poem in poems_result.data if poem['id'] not in existing_poem_ids]
+            # Filter out items that are already in the vibe profile or in the exclusion list
+            available_poems = [poem for poem in poems_result.data if poem['id'] not in existing_item_ids]
             
             if not available_poems:
                 return []
@@ -430,9 +457,18 @@ class VibeProfileManager:
                     poem_embedding = np.array(poem_embedding, dtype=np.float32)
                     
                     # Calculate cosine similarity
-                    similarity = np.dot(vector, poem_embedding) / (
-                        np.linalg.norm(vector) * np.linalg.norm(poem_embedding)
-                    )
+                    vector_norm = np.linalg.norm(vector)
+                    poem_norm = np.linalg.norm(poem_embedding)
+                    
+                    # Avoid division by zero and NaN values
+                    if vector_norm == 0 or poem_norm == 0:
+                        similarity = 0.0
+                    else:
+                        similarity = np.dot(vector, poem_embedding) / (vector_norm * poem_norm)
+                        # Ensure similarity is a valid number
+                        similarity = float(similarity)
+                        if math.isnan(similarity) or math.isinf(similarity):
+                            similarity = 0.0
                     
                     similarities.append({
                         'poem': poem,
@@ -446,4 +482,24 @@ class VibeProfileManager:
         except Exception as e:
             print(f"Error in manual similarity search: {e}")
             return []
+    
+    def delete_vibe_profile(self, vibe_profile_id: str) -> bool:
+        """Delete a vibe profile and all its associated items."""
+        try:
+            # First, delete all vibe_profile_items entries for this vibe profile
+            delete_items_result = self.supabase.table('vibe_profile_items').delete().eq('vibe_profile_id', vibe_profile_id).execute()
+            
+            # Then delete the vibe profile itself
+            delete_vibe_result = self.supabase.table('vibe_profiles').delete().eq('id', vibe_profile_id).execute()
+            
+            if delete_vibe_result.data:
+                print(f"Successfully deleted vibe profile {vibe_profile_id}")
+                return True
+            else:
+                print(f"Failed to delete vibe profile {vibe_profile_id}")
+                return False
+                
+        except Exception as e:
+            print(f"Error deleting vibe profile {vibe_profile_id}: {e}")
+            return False
     
