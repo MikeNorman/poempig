@@ -107,7 +107,7 @@ class SemanticTagger:
                                 result[category].append({"tag": tag, "relevance": relevance})
             
             # Ensure we have at least some meaningful tags
-            total_tags = sum(len(result[cat]) for cat in result.values())
+            total_tags = sum(len(result[cat]) for cat in result.keys())
             if total_tags < 2:
                 return {"emotions": [], "themes": [], "imagery": [], "style": []}
             
@@ -115,6 +115,8 @@ class SemanticTagger:
             
         except Exception as e:
             print(f"Error analyzing poem: {e}")
+            import traceback
+            traceback.print_exc()
             return {"emotions": [], "themes": [], "imagery": [], "style": []}
     
     def get_search_tags(self, query: str) -> List[str]:

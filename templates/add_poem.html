@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Poem - Poem Pig</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        .form-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            border: 2px solid #4A90E2;
+            max-width: 800px;
+            margin: 0 auto 30px auto;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #4A90E2;
+            font-size: 1.1rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: 'Georgia', serif;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #4A90E2;
+            box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
+        }
+        
+        .form-textarea {
+            min-height: 200px;
+            resize: vertical;
+        }
+        
+        .type-toggle {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        .toggle-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 10px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .toggle-option:hover {
+            border-color: #4A90E2;
+            background-color: rgba(74, 144, 226, 0.1);
+        }
+        
+        .toggle-option.selected {
+            border-color: #4A90E2;
+            background-color: #4A90E2;
+            color: white;
+        }
+        
+        .toggle-option input[type="radio"] {
+            margin: 0;
+        }
+        
+        .submit-btn {
+            background: linear-gradient(135deg, #4A90E2 0%, #7B68EE 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 5px solid #28a745;
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 5px solid #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav class="nav">
+            <div class="nav-content">
+                <a href="/" class="nav-btn">New Vibe</a>
+                <a href="/vibes" class="nav-btn">Vibe List</a>
+            </div>
+        </nav>
+
+        <div class="header">
+            <h1>
+                <span class="pig-icon">🐷</span>
+                Add New Poem
+            </h1>
+            <p>Add a new poem or quote to the database</p>
+        </div>
+
+        <div class="form-container">
+            <form id="poem-form">
+                <div class="form-group">
+                    <label for="author" class="form-label">Author</label>
+                    <input type="text" id="author" name="author" class="form-input" placeholder="Enter the author's name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="title" class="form-label">Title</label>
+                    <input type="text" id="title" name="title" class="form-input" placeholder="Enter the poem title" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="body" class="form-label">Poem Text</label>
+                    <textarea id="body" name="body" class="form-input form-textarea" placeholder="Enter the full poem text here..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Type</label>
+                    <div class="type-toggle">
+                        <div class="toggle-option selected" data-type="poem">
+                            <input type="radio" id="type-poem" name="type" value="poem" checked>
+                            <label for="type-poem">Poem</label>
+                        </div>
+                        <div class="toggle-option" data-type="quote">
+                            <input type="radio" id="type-quote" name="type" value="quote">
+                            <label for="type-quote">Quote</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submit-btn">
+                    Add to Database
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/static/shared.js"></script>
+    <script>
+        // Handle type toggle
+        document.querySelectorAll('.toggle-option').forEach(option => {
+            option.addEventListener('click', function() {
+                // Remove selected class from all options
+                document.querySelectorAll('.toggle-option').forEach(opt => opt.classList.remove('selected'));
+                // Add selected class to clicked option
+                this.classList.add('selected');
+                // Check the radio button
+                this.querySelector('input[type="radio"]').checked = true;
+            });
+        });
+
+        // Handle form submission
+        document.getElementById('poem-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submit-btn');
+            const originalText = submitBtn.textContent;
+            
+            try {
+                // Disable submit button
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Adding...';
+                
+                // Get form data
+                const formData = {
+                    author: document.getElementById('author').value.trim(),
+                    title: document.getElementById('title').value.trim(),
+                    text: document.getElementById('body').value.trim(),
+                    type: document.querySelector('input[name="type"]:checked').value
+                };
+                
+                // Validate required fields
+                if (!formData.author || !formData.title || !formData.text) {
+                    throw new Error('Please fill in all required fields');
+                }
+                
+                // Send to backend
+                const response = await fetch('/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to add poem');
+                }
+                
+                const result = await response.json();
+                
+                // Show success message
+                showSuccessMessage(`Poem added successfully! ID: ${result.item_id}`);
+                
+                // Reset form
+                document.getElementById('poem-form').reset();
+                document.querySelector('.toggle-option[data-type="poem"]').classList.add('selected');
+                document.querySelector('.toggle-option[data-type="quote"]').classList.remove('selected');
+                
+            } catch (error) {
+                console.error('Error adding poem:', error);
+                showErrorMessage(error.message);
+            } finally {
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        });
+        
+        function showSuccessMessage(message) {
+            // Remove any existing messages
+            document.querySelectorAll('.success-message, .error-message').forEach(msg => msg.remove());
+            
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message';
+            successDiv.textContent = message;
+            
+            const formContainer = document.querySelector('.form-container');
+            formContainer.insertBefore(successDiv, formContainer.firstChild);
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                successDiv.remove();
+            }, 5000);
+        }
+        
+        function showErrorMessage(message) {
+            // Remove any existing messages
+            document.querySelectorAll('.success-message, .error-message').forEach(msg => msg.remove());
+            
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            
+            const formContainer = document.querySelector('.form-container');
+            formContainer.insertBefore(errorDiv, formContainer.firstChild);
+        }
+    </script>
+</body>
+</html>

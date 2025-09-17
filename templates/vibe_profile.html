@@ -199,10 +199,13 @@
 
         async function loadSimilarPoems(seedId) {
             try {
+                // Add offset to get different results
+                const offset = displayedPoemIds.size;
+                
                 const response = await fetch(`${API_BASE_URL}/find-similar`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ item_id: seedId, top_k: 10 })
+                    body: JSON.stringify({ item_id: seedId, top_k: 10, offset: offset })
                 });
                 
                 if (!response.ok) {
@@ -448,6 +451,8 @@
                 // Use the first item as seed for more similar poems
                 const firstItemId = Array.from(vibeProfilePoems)[0];
                 loadSimilarPoems(firstItemId);
+            } else {
+                showError('No poems available to find more similar items');
             }
         }
 

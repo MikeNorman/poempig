@@ -11,7 +11,7 @@ import re
 from typing import List, Dict, Any, Optional
 from supabase import create_client, Client
 from dotenv import load_dotenv
-from .local_semantic_tagger import LocalSemanticTagger
+from .semantic_tagger import SemanticTagger
 
 # Load environment variables
 load_dotenv()
@@ -25,8 +25,45 @@ class ItemRecommendationEngine:
         self.supabase_key = os.getenv('SUPABASE_SERVICE_ROLE_KEY')
         self.supabase: Client = create_client(self.supabase_url, self.supabase_key)
         
-        # Initialize local semantic tagger
-        self.tagger = LocalSemanticTagger()
+        # Initialize semantic tagger
+        self.tagger = SemanticTagger()
+        
+        # Initialize OpenAI client for embeddings
+        from openai import OpenAI
+        self.openai_client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+        self.embedding_model = os.getenv('EMBEDDING_MODEL', 'text-embedding-3-small')
+        
+        # Cache for embeddings
+        self.embeddings_cache = {}
+    
+    def get_embedding(self, text: str) -> List[float]:
+        """
+        Get embedding for text using OpenAI API.
+        
+        Args:
+            text (str): Text to embed
+            
+        Returns:
+            List[float]: Embedding vector
+        """
+        # Check cache first
+        if text in self.embeddings_cache:
+            return self.embeddings_cache[text]
+        
+        try:
+            response = self.openai_client.embeddings.create(
+                model=self.embedding_model,
+                input=text
+            )
+            embedding = response.data[0].embedding
+            
+            # Cache the embedding
+            self.embeddings_cache[text] = embedding
+            return embedding
+            
+        except Exception as e:
+            print(f"Error generating embedding: {e}")
+            return []
         
     def search_items(self, query: str) -> List[Dict[str, Any]]:
         """
@@ -50,10 +87,10 @@ class ItemRecommendationEngine:
                 keyword_results = self._search_by_keywords(phrase)
                 all_results.extend(keyword_results)
         
-        # 2. Semantic search for natural language (tag-based matching)
+        # 2. Keyword search for natural language (fallback to keyword search)
         if natural_language:
-            semantic_results = self._search_by_semantic_similarity(natural_language)
-            all_results.extend(semantic_results)
+            keyword_results = self._search_by_keywords(natural_language)
+            all_results.extend(keyword_results)
         
         # 3. Fallback: if no natural language, do keyword search on the whole query
         if not natural_language and not quoted_phrases:
@@ -116,14 +153,14 @@ class ItemRecommendationEngine:
                     })
             
             # Remove duplicates and sort by relevance
-            item_scores = {}
+            unique_results = {}
             for result in results:
                 item_id = result['item']['id']
-                if item_id not in item_scores or item_scores[item_id]['similarity'] < result['similarity']:
-                    item_scores[item_id] = result
+                if item_id not in unique_results or unique_results[item_id]['similarity'] < result['similarity']:
+                    unique_results[item_id] = result
             
-            # Return all results sorted by similarity
-            final_results = list(item_scores.values())
+            # Sort by similarity and return all results
+            final_results = list(unique_results.values())
             final_results.sort(key=lambda x: x['similarity'], reverse=True)
             return final_results
             
@@ -131,24 +168,12 @@ class ItemRecommendationEngine:
             print(f"Error in keyword search: {e}")
             return []
     
-    def search_by_keywords(self, keywords: str) -> List[Dict[str, Any]]:
-        """
-        Public method to search items by keywords.
-        
-        Args:
-            keywords (str): Keywords to search for
-            
-        Returns:
-            List[Dict]: List of matching items
-        """
-        return self._search_by_keywords(keywords)
-    
     def _search_by_semantic_similarity(self, query_text: str) -> List[Dict[str, Any]]:
         """
-        Search poems using semantic similarity (structured tag-based matching).
+        Search poems using semantic similarity based on tags.
         
         Args:
-            query_text (str): Text to find similar poems for
+            query_text (str): Query text to search for
             
         Returns:
             List[Dict]: List of similar poems with similarity scores
@@ -195,7 +220,7 @@ class ItemRecommendationEngine:
             return final_results
             
         except Exception as e:
-            print(f"Error in semantic search: {e}")
+            print(f"Error in keyword search: {e}")
             return []
     
     def _parse_structured_tags(self, tags_array: List[str]) -> Dict[str, List[Dict[str, float]]]:
@@ -270,4 +295,54 @@ class ItemRecommendationEngine:
             return None
         except Exception as e:
             print(f"Error getting item by ID: {e}")
+            return None
+    
+    def add_item(self, title: str, author: str, text: str, item_type: str = 'poem') -> Optional[str]:
+        """Add a new item (poem or quote) to the database.
+        
+        Args:
+            title: The title of the item
+            author: The author of the item
+            text: The text content of the item
+            item_type: Type of item ('poem' or 'quote')
+            
+        Returns:
+            str: The ID of the created item, or None if failed
+        """
+        try:
+            # Generate semantic tags for the text
+            structured_tags = self.tagger.analyze_poem(text, title, author)
+            
+            # Convert structured tags to array format for database storage
+            tags_array = []
+            for category, tag_list in structured_tags.items():
+                if tag_list:  # Only add non-empty categories
+                    tags_array.append(json.dumps({category: tag_list}))
+            
+            # Generate embedding for the text
+            embedding = self.get_embedding(text)
+            
+            # Create the item data
+            item_data = {
+                'title': title,
+                'author': author,
+                'text': text,
+                'type': item_type,
+                'semantic_tags': tags_array,
+                'embedding': embedding
+            }
+            
+            # Insert into database
+            result = self.supabase.table('items').insert(item_data).execute()
+            
+            if result.data and len(result.data) > 0:
+                item_id = result.data[0]['id']
+                print(f"Successfully added {item_type}: {title} by {author} (ID: {item_id})")
+                return item_id
+            else:
+                print(f"Failed to add {item_type}: {title}")
+                return None
+                
+        except Exception as e:
+            print(f"Error adding item: {e}")
             return None

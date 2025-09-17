@@ -506,3 +506,73 @@ class VibeProfileManager:
             print(f"Error deleting vibe profile {vibe_profile_id}: {e}")
             return False
     
+    def cleanup_vibe_profiles_with_few_items(self, min_items=2):
+        """Delete vibe profiles that have fewer than the specified minimum number of items."""
+        try:
+            # Get all vibe profiles with their item counts
+            profiles_result = self.supabase.table('vibe_profiles').select('id, name, size').execute()
+            
+            if not profiles_result.data:
+                print("No vibe profiles found")
+                return
+            
+            profiles_to_delete = []
+            
+            for profile in profiles_result.data:
+                item_count = profile.get('size', 0)
+                if item_count < min_items:
+                    profiles_to_delete.append({
+                        'id': profile['id'],
+                        'name': profile['name'],
+                        'item_count': item_count
+                    })
+            
+            if not profiles_to_delete:
+                print(f"All vibe profiles have {min_items} or more items. No cleanup needed.")
+                return
+            
+            print(f"Found {len(profiles_to_delete)} vibe profiles with fewer than {min_items} items:")
+            for profile in profiles_to_delete:
+                print(f"  - {profile['name']} (ID: {profile['id']}) - {profile['item_count']} items")
+            
+            # Ask for confirmation
+            response = input(f"\nDelete these {len(profiles_to_delete)} vibe profiles? (y/N): ")
+            if response.lower() != 'y':
+                print("Cleanup cancelled.")
+                return
+            
+            # Delete the profiles
+            deleted_count = 0
+            for profile in profiles_to_delete:
+                if self.delete_vibe_profile(profile['id']):
+                    deleted_count += 1
+                    print(f"✅ Deleted: {profile['name']}")
+                else:
+                    print(f"❌ Failed to delete: {profile['name']}")
+            
+            print(f"\nCleanup complete. Deleted {deleted_count} out of {len(profiles_to_delete)} vibe profiles.")
+            
+        except Exception as e:
+            print(f"Error during cleanup: {e}")
+
+if __name__ == '__main__':
+    # Run cleanup when script is executed directly
+    import sys
+    
+    # Load environment variables
+    load_dotenv()
+    
+    # Initialize vibe profile manager
+    vibe_manager = VibeProfileManager()
+    
+    # Get minimum items from command line argument or use default
+    min_items = 2
+    if len(sys.argv) > 1:
+        try:
+            min_items = int(sys.argv[1])
+        except ValueError:
+            print("Invalid minimum items value. Using default of 2.")
+    
+    print(f"🧹 Starting cleanup of vibe profiles with fewer than {min_items} items...")
+    vibe_manager.cleanup_vibe_profiles_with_few_items(min_items)
+    

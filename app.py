@@ -179,6 +179,7 @@ def find_similar():
         data = request.get_json()
         item_id = data.get('item_id', '')
         top_k = int(data.get('top_k', 5))
+        offset = int(data.get('offset', 0))
         
         if not item_id:
             return jsonify({'error': 'Item ID is required'}), 400
@@ -194,10 +195,17 @@ def find_similar():
         # Filter out the original item
         similar_items = [result for result in similar_items if result['item']['id'] != item_id]
         
+        # Apply offset and limit
+        start_idx = offset
+        end_idx = offset + top_k
+        paginated_results = similar_items[start_idx:end_idx]
+        
         return jsonify({
             'item_id': item_id,
-            'results': similar_items[:top_k],
-            'count': len(similar_items[:top_k])
+            'results': paginated_results,
+            'count': len(paginated_results),
+            'offset': offset,
+            'total_available': len(similar_items)
         })
         
     except Exception as e:
@@ -365,6 +373,48 @@ def search_keywords():
         
     except Exception as e:
         return jsonify({'error': f'Search failed: {str(e)}'}), 500
+
+@app.route('/add', methods=['POST'])
+def add_poem():
+    """Add a new poem or quote to the database"""
+    if not engine:
+        return jsonify({'error': 'Recommendation engine not available'}), 500
+    
+    try:
+        data = request.get_json()
+        author = data.get('author', '').strip()
+        title = data.get('title', '').strip()
+        text = data.get('text', '').strip()
+        item_type = data.get('type', 'poem').strip()
+        
+        # Validate required fields
+        if not author or not title or not text:
+            return jsonify({'error': 'Author, title, and text are required'}), 400
+        
+        # Add the item to the database
+        item_id = engine.add_item(
+            title=title,
+            author=author,
+            text=text,
+            item_type=item_type
+        )
+        
+        if item_id:
+            return jsonify({
+                'success': True,
+                'item_id': item_id,
+                'message': f'{item_type.title()} added successfully'
+            })
+        else:
+            return jsonify({'error': 'Failed to add item to database'}), 500
+            
+    except Exception as e:
+        return jsonify({'error': f'Failed to add poem: {str(e)}'}), 500
+
+@app.route('/add')
+def add_poem_page():
+    """Serve the add poem form page"""
+    return render_template('add_poem.html')
 
 @app.route('/health')
 def health():
