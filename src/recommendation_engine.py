@@ -109,6 +109,10 @@ class ItemRecommendationEngine:
         final_results.sort(key=lambda x: x['similarity'], reverse=True)
         return final_results
     
+    def search_by_keywords(self, keywords: str) -> List[Dict[str, Any]]:
+        """Search items by keywords in title, author, or text."""
+        return self._search_by_keywords(keywords)
+    
     def _search_by_keywords(self, keywords: str) -> List[Dict[str, Any]]:
         """
         Search poems by exact keyword matching in title, author, and text.

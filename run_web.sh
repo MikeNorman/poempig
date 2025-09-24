@@ -1,17 +1,20 @@
 #!/bin/bash
 # Simple web server startup - no ML dependencies
 
+# Always run from repo root
+cd "$(dirname "$0")"
+
 # Ensure Python virtual environment is set up and activated
-if [ ! -d ".venv" ]; then
+if [ ! -d "venv" ]; then
     echo "Creating Python virtual environment..."
-    python3 -m venv .venv
+    python3 -m venv venv
 fi
-source .venv/bin/activate
+source venv/bin/activate
 
 # Install web-only dependencies
 echo "Installing web dependencies..."
-pip3 install -r requirements-web.txt
+pip install -r requirements-web.txt
 
 echo "Starting Flask web server with auto-reload..."
 echo "🔄 Code changes will automatically restart the server"
-python3 app.py
+python app.py

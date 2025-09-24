@@ -62,6 +62,36 @@ poem_recommender/
 
 ## Usage
 
+### Quick Start Options
+
+#### Option 1: Full App (Recommended)
+```bash
+# Use the provided startup script (handles virtual environment automatically)
+./run_backend.sh
+```
+
+#### Option 2: Simple Mode (Fast startup, limited features)
+```bash
+# Start with minimal dependencies for quick testing
+./start_simple.sh
+```
+
+#### Option 3: Manual Setup
+```bash
+# Activate virtual environment
+source venv/bin/activate
+
+# Install dependencies (if not already installed)
+pip install -r requirements.txt
+
+# Start the app
+python app.py
+```
+
+**Note:** If you encounter dependency issues (especially with scikit-learn on Python 3.13), use Option 2 for quick testing or update your Python version.
+
+Then visit `http://localhost:5001` in your browser.
+
 ### Processing Documents
 ```bash
 # Extract poems from a document
@@ -70,13 +100,6 @@ python scripts/segment_unstructured.py --input "your_document.docx" --out "poems
 # Ingest poems into database
 python scripts/ingest_complete.py --input data/segments.jsonl --source "Document Name"
 ```
-
-### Running the Web App
-```bash
-python app.py
-```
-
-Then visit `http://localhost:5000` in your browser.
 
 ## Database Schema
 

@@ -5,8 +5,7 @@ Flask Web Application for Poem Recommender
 from flask import Flask, render_template, request, jsonify, send_from_directory, redirect
 from flask_cors import CORS
 import os
-from dotenv import load_dotenv
-from src.vibe_profile_manager import VibeProfileManager                                                      
+from dotenv import load_dotenv                                                      
 
 # Load environment variables
 load_dotenv()
@@ -16,21 +15,31 @@ CORS(app)
 
 
 # Initialize recommendation engine (lazy import to avoid heavy deps during simple runs)
-try:
-    from src.recommendation_engine import ItemRecommendationEngine
-    engine = ItemRecommendationEngine()
-    print("✅ Recommendation engine initialized successfully")                                                      
-except Exception as e:
-    print(f"❌ Error initializing recommendation engine: {e}")                                                      
-    engine = None
+engine = None
+vibe_manager = None
 
-# Initialize vibe profile manager
-try:
-    vibe_manager = VibeProfileManager()
-    print("✅ Vibe profile manager initialized successfully")
-except Exception as e:
-    print(f"❌ Error initializing vibe profile manager: {e}")
-    vibe_manager = None
+# Skip ML imports if environment variable is set
+if os.environ.get('SKIP_ML_IMPORTS', '').lower() == 'true':
+    print("⚠️  Skipping ML imports - running in simple mode")
+    print("   Some features will be disabled. Use ./run_backend.sh for full functionality.")
+else:
+    try:
+        from src.recommendation_engine import ItemRecommendationEngine
+        engine = ItemRecommendationEngine()
+        print("✅ Recommendation engine initialized successfully")                                                      
+    except Exception as e:
+        print(f"❌ Error initializing recommendation engine: {e}")                                                      
+        print("   Try running ./start_simple.sh for basic functionality")
+        engine = None
+
+    # Initialize vibe profile manager
+    try:
+        from src.vibe_profile_manager import VibeProfileManager
+        vibe_manager = VibeProfileManager()
+        print("✅ Vibe profile manager initialized successfully")
+    except Exception as e:
+        print(f"❌ Error initializing vibe profile manager: {e}")
+        vibe_manager = None
 
 @app.route('/')
 def index():
