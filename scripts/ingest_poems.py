@@ -55,27 +55,25 @@ def main():
                 author=m.group(1).strip()
                 text=re.sub(r"(?:^|\n)\s*[—–-]{1,2}\s*([A-Za-z\.\-'' ]+)(?:,.*)?\s*$","",text).strip()
 
-        title=None  # << leave NULL (no inference)
+        title=obj.get("title")  # Use title from data if available
 
         try:
             lang=detect(text)
         except Exception:
             lang="und"
 
+        # Use source_url from data if available, otherwise use args.source
+        source = obj.get("source_url") or args.source
+        
         row={
-            "content_hash": chash(text),
-            "kind": kind,
-            "title": title,                 # stays NULL
+            "title": title,
             "author": author or None,
             "text": text,
-            "lang": lang,
-            "lines_count": len([x for x in text.splitlines() if x.strip()]),
-            "tags": {"themes": [], "tone": [], "form": [], "devices": []},  # MVP: empty
+            "semantic_tags": [],
             "embedding": embed(text),
-            "source": args.source,
-            "visibility": "private",
+            "source": source,
         }
-        sb.table("poems").upsert(row, on_conflict="content_hash").execute()
+        sb.table("items").insert(row).execute()
 
     print("Done.")
 

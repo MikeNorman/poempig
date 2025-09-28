@@ -14,32 +14,29 @@ app = Flask(__name__)
 CORS(app)
 
 
-# Initialize recommendation engine (lazy import to avoid heavy deps during simple runs)
+# Initialize recommendation engine and vibe profile manager
 engine = None
 vibe_manager = None
 
-# Skip ML imports if environment variable is set
-if os.environ.get('SKIP_ML_IMPORTS', '').lower() == 'true':
-    print("⚠️  Skipping ML imports - running in simple mode")
-    print("   Some features will be disabled. Use ./run_backend.sh for full functionality.")
-else:
-    try:
-        from src.recommendation_engine import ItemRecommendationEngine
-        engine = ItemRecommendationEngine()
-        print("✅ Recommendation engine initialized successfully")                                                      
-    except Exception as e:
-        print(f"❌ Error initializing recommendation engine: {e}")                                                      
-        print("   Try running ./start_simple.sh for basic functionality")
-        engine = None
+# Always try to initialize ML components
+try:
+    from src.recommendation_engine import ItemRecommendationEngine
+    engine = ItemRecommendationEngine()
+    print("✅ Recommendation engine initialized successfully")                                                      
+except Exception as e:
+    print(f"❌ Error initializing recommendation engine: {e}")                                                      
+    print("   Some features will be disabled.")
+    engine = None
 
-    # Initialize vibe profile manager
-    try:
-        from src.vibe_profile_manager import VibeProfileManager
-        vibe_manager = VibeProfileManager()
-        print("✅ Vibe profile manager initialized successfully")
-    except Exception as e:
-        print(f"❌ Error initializing vibe profile manager: {e}")
-        vibe_manager = None
+# Initialize vibe profile manager
+try:
+    from src.vibe_profile_manager import VibeProfileManager
+    vibe_manager = VibeProfileManager()
+    print("✅ Vibe profile manager initialized successfully")
+except Exception as e:
+    print(f"❌ Error initializing vibe profile manager: {e}")
+    print("   Vibe profile features will be disabled.")
+    vibe_manager = None
 
 @app.route('/')
 def index():
@@ -424,6 +421,69 @@ def add_poem():
 def add_poem_page():
     """Serve the add poem form page"""
     return render_template('add_poem.html')
+
+@app.route('/scrape-url', methods=['POST'])
+def scrape_url():
+    """Scrape items (poems/quotes) from a URL and ingest them"""
+    try:
+        data = request.get_json()
+        if not data or 'url' not in data:
+            return jsonify({'error': 'URL is required'}), 400
+        
+        url = data['url']
+        source = data.get('source', 'Web Scraper')
+        
+        # Import scraper here to avoid import issues if dependencies missing
+        try:
+            from src.scraper_ingestion import scrape_and_ingest_url
+        except ImportError as e:
+            return jsonify({'error': f'Scraping dependencies not available: {e}'}), 500
+        
+        # Scrape and ingest the URL
+        count = scrape_and_ingest_url(url, source)
+        
+        return jsonify({
+            'success': True,
+            'message': f'Successfully scraped and ingested {count} items from {url}',
+            'items_ingested': count,
+            'url': url
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Error scraping URL: {str(e)}'}), 500
+
+@app.route('/scrape-urls', methods=['POST'])
+def scrape_urls():
+    """Scrape items (poems/quotes) from multiple URLs and ingest them"""
+    try:
+        data = request.get_json()
+        if not data or 'urls' not in data:
+            return jsonify({'error': 'URLs list is required'}), 400
+        
+        urls = data['urls']
+        source = data.get('source', 'Web Scraper')
+        
+        if not isinstance(urls, list) or len(urls) == 0:
+            return jsonify({'error': 'URLs must be a non-empty list'}), 400
+        
+        # Import scraper here to avoid import issues if dependencies missing
+        try:
+            from src.scraper_ingestion import scrape_and_ingest_urls
+        except ImportError as e:
+            return jsonify({'error': f'Scraping dependencies not available: {e}'}), 500
+        
+        # Scrape and ingest the URLs
+        total_count = scrape_and_ingest_urls(urls, source)
+        
+        return jsonify({
+            'success': True,
+            'message': f'Successfully scraped and ingested {total_count} items from {len(urls)} URLs',
+            'items_ingested': total_count,
+            'urls_processed': len(urls)
+        })
+        
+    except Exception as e:
+        return jsonify({'error': f'Error scraping URLs: {str(e)}'}), 500
 
 @app.route('/health')
 def health():

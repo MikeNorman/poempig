@@ -1,0 +1,658 @@
+{
+  "ip_history": [
+    {
+      "timestamp": "2025-09-27T15:48:47.115678",
+      "old_ip": "194.195.93.115",
+      "new_ip": "185.169.0.204",
+      "success_rate_before": 0.0
+    },
+    {
+      "timestamp": "2025-09-27T15:52:00.103441",
+      "old_ip": "185.169.0.204",
+      "new_ip": "192.145.118.127",
+      "success_rate_before": 0.7878787878787878
+    }
+  ],
+  "rate_limit_events": [
+    {
+      "timestamp": "2025-09-27T15:13:14.575354",
+      "ip": "46.234.47.105",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 2,
+        "url": "https://allpoetry.com/William-Shakespeare",
+        "consecutive_failures": 1,
+        "rate_limit_count": 1
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:13:17.256531",
+      "ip": "46.234.47.105",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/poem/add",
+        "consecutive_failures": 1,
+        "rate_limit_count": 1
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:13:20.607666",
+      "ip": "46.234.47.105",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 1,
+        "url": "https://allpoetry.com/poem/add",
+        "consecutive_failures": 1,
+        "rate_limit_count": 1
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:13:23.134230",
+      "ip": "46.234.47.105",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/poem/edit/",
+        "consecutive_failures": 2,
+        "rate_limit_count": 2
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:13:28.068162",
+      "ip": "46.234.47.105",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 1,
+        "url": "https://allpoetry.com/poem/edit/",
+        "consecutive_failures": 2,
+        "rate_limit_count": 2
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:13:28.597750",
+      "ip": "46.234.47.105",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/poem/8509497-A-Man-by-Charles-Bukowski",
+        "consecutive_failures": 3,
+        "rate_limit_count": 3
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:13:34.050645",
+      "ip": "46.234.47.105",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/poem/14326888-air-and-light-and-time-and-space-by-Charles-Bukowski",
+        "consecutive_failures": 4,
+        "rate_limit_count": 4
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:13:35.541960",
+      "ip": "46.234.47.105",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 1,
+        "url": "https://allpoetry.com/poem/8498399-A-Life-by-Sylvia-Plath",
+        "consecutive_failures": 3,
+        "rate_limit_count": 3
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:13:39.530691",
+      "ip": "46.234.47.105",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/poem/10257717-Beasts-Bounding-Through-Time-by-Charles-Bukowski",
+        "consecutive_failures": 5,
+        "rate_limit_count": 5
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:13:43.033174",
+      "ip": "46.234.47.105",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 1,
+        "url": "https://allpoetry.com/poem/8498221-A-Winter-s-Tale-by-Sylvia-Plath",
+        "consecutive_failures": 4,
+        "rate_limit_count": 4
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:13:45.022543",
+      "ip": "46.234.47.105",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/poem/8509539-Bluebird-by-Charles-Bukowski",
+        "consecutive_failures": 6,
+        "rate_limit_count": 6
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:13:50.773247",
+      "ip": "46.234.47.105",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/poem/8509487-Confession-by-Charles-Bukowski",
+        "consecutive_failures": 7,
+        "rate_limit_count": 7
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:13:50.773968",
+      "ip": "46.234.47.105",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 1,
+        "url": "https://allpoetry.com/poem/8498477-Admonition-by-Sylvia-Plath",
+        "consecutive_failures": 5,
+        "rate_limit_count": 5
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:13:56.242022",
+      "ip": "46.234.47.105",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/poem/8509457-Curtain-by-Charles-Bukowski",
+        "consecutive_failures": 8,
+        "rate_limit_count": 8
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:13:58.266859",
+      "ip": "46.234.47.105",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 1,
+        "url": "https://allpoetry.com/poem/8498423-Aftermath-by-Sylvia-Plath",
+        "consecutive_failures": 6,
+        "rate_limit_count": 6
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:14:01.735350",
+      "ip": "46.234.47.105",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/poem/8509467-Finish-by-Charles-Bukowski",
+        "consecutive_failures": 9,
+        "rate_limit_count": 9
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:14:05.818293",
+      "ip": "46.234.47.105",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 1,
+        "url": "https://allpoetry.com/poem/8498467-Ariel-by-Sylvia-Plath",
+        "consecutive_failures": 7,
+        "rate_limit_count": 7
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:14:07.593427",
+      "ip": "46.234.47.105",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/poem/14326881-For-The-Foxes-by-Charles-Bukowski",
+        "consecutive_failures": 10,
+        "rate_limit_count": 10
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:14:13.279849",
+      "ip": "46.234.47.105",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 1,
+        "url": "https://allpoetry.com/poem/8498145-Bluebeard-by-Sylvia-Plath",
+        "consecutive_failures": 8,
+        "rate_limit_count": 8
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:14:20.881994",
+      "ip": "46.234.47.105",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 1,
+        "url": "https://allpoetry.com/poem/8498433-Child-by-Sylvia-Plath",
+        "consecutive_failures": 9,
+        "rate_limit_count": 9
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:14:28.363312",
+      "ip": "46.234.47.105",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 1,
+        "url": "https://allpoetry.com/poem/8498493-Cinderella-by-Sylvia-Plath",
+        "consecutive_failures": 10,
+        "rate_limit_count": 10
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:16:09.281430",
+      "ip": "80.253.251.56",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/Charles-Bukowski",
+        "consecutive_failures": 1,
+        "rate_limit_count": 1
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:16:09.337523",
+      "ip": "80.253.251.56",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 1,
+        "url": "https://allpoetry.com/Sylvia-Plath",
+        "consecutive_failures": 1,
+        "rate_limit_count": 1
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:16:09.609576",
+      "ip": "80.253.251.56",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 2,
+        "url": "https://allpoetry.com/William-Shakespeare",
+        "consecutive_failures": 1,
+        "rate_limit_count": 1
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:16:15.069199",
+      "ip": "80.253.251.56",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/Emily-Dickinson",
+        "consecutive_failures": 2,
+        "rate_limit_count": 2
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:16:17.076684",
+      "ip": "80.253.251.56",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 1,
+        "url": "https://allpoetry.com/Robert-Frost",
+        "consecutive_failures": 2,
+        "rate_limit_count": 2
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:16:19.115048",
+      "ip": "80.253.251.56",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 2,
+        "url": "https://allpoetry.com/Maya-Angelou",
+        "consecutive_failures": 2,
+        "rate_limit_count": 2
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:34:14.622202",
+      "ip": "195.179.201.69",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 2,
+        "url": "https://allpoetry.com/poem/14326593-A-Girl-s-Garden-by-Robert-Frost",
+        "consecutive_failures": 1,
+        "rate_limit_count": 1
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:34:15.611952",
+      "ip": "195.179.201.69",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 1,
+        "url": "https://allpoetry.com/poem/8493915-Epithalamion-by-e.e.-cummings/",
+        "consecutive_failures": 1,
+        "rate_limit_count": 1
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:34:22.665192",
+      "ip": "195.179.201.69",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 1,
+        "url": "https://allpoetry.com/poem/8494065-fl...--2--by-e.e.-cummings/",
+        "consecutive_failures": 2,
+        "rate_limit_count": 2
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:34:23.657284",
+      "ip": "195.179.201.69",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 2,
+        "url": "https://allpoetry.com/poem/14326581-A-Hillside-Thaw-by-Robert-Frost",
+        "consecutive_failures": 2,
+        "rate_limit_count": 2
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:34:32.692223",
+      "ip": "195.179.201.69",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 2,
+        "url": "https://allpoetry.com/poem/14326575-A-Passing-Glimpse-by-Robert-Frost",
+        "consecutive_failures": 3,
+        "rate_limit_count": 3
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:34:41.730585",
+      "ip": "195.179.201.69",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 2,
+        "url": "https://allpoetry.com/poem/12282902-A-Patch-of-Snow-by-Robert-Frost",
+        "consecutive_failures": 4,
+        "rate_limit_count": 4
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:34:50.774857",
+      "ip": "195.179.201.69",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 2,
+        "url": "https://allpoetry.com/poem/14326592-A-Peck-of-Gold-by-Robert-Frost",
+        "consecutive_failures": 5,
+        "rate_limit_count": 5
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:46:15.011876",
+      "ip": "194.195.93.115",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/poem/11503372-A-Cabin-In-The-Clearing-by-Robert-Frost",
+        "consecutive_failures": 1,
+        "rate_limit_count": 1
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:46:20.062136",
+      "ip": "194.195.93.115",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/poem/14326555-A-Fountain--a-Bottle--a-Donkey-s-Ears--and-Some-Books-by-Robert-Frost",
+        "consecutive_failures": 2,
+        "rate_limit_count": 2
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:46:25.111270",
+      "ip": "194.195.93.115",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/poem/14326593-A-Girl-s-Garden-by-Robert-Frost",
+        "consecutive_failures": 3,
+        "rate_limit_count": 3
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:46:30.149617",
+      "ip": "194.195.93.115",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/poem/14326581-A-Hillside-Thaw-by-Robert-Frost",
+        "consecutive_failures": 4,
+        "rate_limit_count": 4
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:46:35.185422",
+      "ip": "194.195.93.115",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/poem/14326575-A-Passing-Glimpse-by-Robert-Frost",
+        "consecutive_failures": 5,
+        "rate_limit_count": 5
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:46:40.222650",
+      "ip": "194.195.93.115",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/poem/12282902-A-Patch-of-Snow-by-Robert-Frost",
+        "consecutive_failures": 6,
+        "rate_limit_count": 6
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:46:45.275726",
+      "ip": "194.195.93.115",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/poem/14326592-A-Peck-of-Gold-by-Robert-Frost",
+        "consecutive_failures": 7,
+        "rate_limit_count": 7
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:48:11.811429",
+      "ip": "194.195.93.115",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/William-Butler-Yeats",
+        "consecutive_failures": 1,
+        "rate_limit_count": 1
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:48:16.849725",
+      "ip": "194.195.93.115",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/e.e.-cummings/",
+        "consecutive_failures": 2,
+        "rate_limit_count": 2
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:51:24.721800",
+      "ip": "185.169.0.204",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/poem/8453671-Spleen-by-T-S-Eliot",
+        "consecutive_failures": 1,
+        "rate_limit_count": 1
+      }
+    },
+    {
+      "timestamp": "2025-09-27T15:51:29.764539",
+      "ip": "185.169.0.204",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/Rabindranath-Tagore",
+        "consecutive_failures": 2,
+        "rate_limit_count": 2
+      }
+    },
+    {
+      "timestamp": "2025-09-27T16:00:40.691690",
+      "ip": "192.145.118.127",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/poem/add",
+        "consecutive_failures": 1,
+        "rate_limit_count": 1
+      }
+    },
+    {
+      "timestamp": "2025-09-27T16:00:45.754839",
+      "ip": "192.145.118.127",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/poem/edit/",
+        "consecutive_failures": 2,
+        "rate_limit_count": 2
+      }
+    },
+    {
+      "timestamp": "2025-09-27T16:00:50.801847",
+      "ip": "192.145.118.127",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/poem/8498399-A-Life-by-Sylvia-Plath",
+        "consecutive_failures": 3,
+        "rate_limit_count": 3
+      }
+    },
+    {
+      "timestamp": "2025-09-27T16:06:44.250201",
+      "ip": "185.187.168.5",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/poem/14326722--Faithful-To-The-End--Amended-by-Emily-Dickinson",
+        "consecutive_failures": 1,
+        "rate_limit_count": 1
+      }
+    },
+    {
+      "timestamp": "2025-09-27T16:06:47.287668",
+      "ip": "185.187.168.5",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/'Tis-Anguish-grander-than-Delight",
+        "consecutive_failures": 2,
+        "rate_limit_count": 2
+      }
+    },
+    {
+      "timestamp": "2025-09-27T16:06:50.724472",
+      "ip": "185.187.168.5",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/'Tis-customary-as-we-part",
+        "consecutive_failures": 3,
+        "rate_limit_count": 3
+      }
+    },
+    {
+      "timestamp": "2025-09-27T16:06:53.759406",
+      "ip": "185.187.168.5",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/poem/14326774--Tis-Good-Mdash-The-Looking-Back-On-Grief-by-Emily-Dickinson",
+        "consecutive_failures": 4,
+        "rate_limit_count": 4
+      }
+    },
+    {
+      "timestamp": "2025-09-27T16:06:56.798638",
+      "ip": "185.187.168.5",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/'Tis-little-I--could-care-for-Pearls",
+        "consecutive_failures": 5,
+        "rate_limit_count": 5
+      }
+    },
+    {
+      "timestamp": "2025-09-27T16:06:59.832083",
+      "ip": "185.187.168.5",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/'Tis-not-that-Dying-hurts-us-so",
+        "consecutive_failures": 6,
+        "rate_limit_count": 6
+      }
+    },
+    {
+      "timestamp": "2025-09-27T16:07:02.866686",
+      "ip": "185.187.168.5",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/'Tis-One-by-One--the-Father-counts",
+        "consecutive_failures": 7,
+        "rate_limit_count": 7
+      }
+    },
+    {
+      "timestamp": "2025-09-27T16:07:06.013459",
+      "ip": "185.187.168.5",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/'Tis-Opposites--entice",
+        "consecutive_failures": 8,
+        "rate_limit_count": 8
+      }
+    },
+    {
+      "timestamp": "2025-09-27T16:07:09.043404",
+      "ip": "185.187.168.5",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/'Tis-so-appalling--it-exhilarates",
+        "consecutive_failures": 9,
+        "rate_limit_count": 9
+      }
+    },
+    {
+      "timestamp": "2025-09-27T16:07:12.084448",
+      "ip": "185.187.168.5",
+      "event_type": "429_error",
+      "details": {
+        "worker_id": 0,
+        "url": "https://allpoetry.com/'Tis-Sunrise--Little-Maid--Hast-Thou",
+        "consecutive_failures": 10,
+        "rate_limit_count": 10
+      }
+    }
+  ],
+  "success_patterns": [],
+  "failure_patterns": []
+}

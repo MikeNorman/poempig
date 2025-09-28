@@ -23,23 +23,30 @@ class VibeProfileManager:
     def assign_item_to_vibe_profile(self, item_id: str, vibe_profile_id: str, similarity_score: float = None) -> bool:
         """Assign an item to a vibe profile."""
         try:
-            # Check if the item is already assigned to this vibe profile
-            existing = self.supabase.table('vibe_profile_items').select('*').eq('vibe_profile_id', vibe_profile_id).eq('item_id', item_id).execute()
+            # Get current vibe profile
+            profile_result = self.supabase.table('vibe_profiles').select('seed_item_ids').eq('id', vibe_profile_id).execute()
             
-            if existing.data:
+            if not profile_result.data:
+                print(f"Vibe profile {vibe_profile_id} not found")
+                return False
+            
+            current_item_ids = profile_result.data[0].get('seed_item_ids', [])
+            
+            # Check if item is already assigned
+            if item_id in current_item_ids:
                 print(f"Item {item_id} is already assigned to vibe profile {vibe_profile_id}")
                 return True  # Already exists, consider it successful
             
-            # Insert the relationship
-            result = self.supabase.table('vibe_profile_items').insert({
-                'vibe_profile_id': vibe_profile_id,
-                'item_id': item_id,
-                'similarity_score': similarity_score
-            }).execute()
+            # Add item to the list
+            new_item_ids = current_item_ids + [item_id]
+            
+            # Update the vibe profile
+            result = self.supabase.table('vibe_profiles').update({
+                'seed_item_ids': new_item_ids,
+                'size': len(new_item_ids)
+            }).eq('id', vibe_profile_id).execute()
             
             if result.data:
-                # Update the size field
-                self._update_vibe_profile_size(vibe_profile_id)
                 # Update the vector
                 self.update_vibe_profile_vector(vibe_profile_id)
                 return True
@@ -52,15 +59,30 @@ class VibeProfileManager:
     def remove_item_from_vibe_profile(self, item_id: str, vibe_profile_id: str) -> bool:
         """Remove an item from a vibe profile."""
         try:
-            # Remove the relationship
-            result = self.supabase.table('vibe_profile_items').delete().eq('item_id', item_id).eq('vibe_profile_id', vibe_profile_id).execute()
+            # Get current vibe profile
+            profile_result = self.supabase.table('vibe_profiles').select('seed_item_ids').eq('id', vibe_profile_id).execute()
             
-            if result.data:
-                # Update the size field
-                self._update_vibe_profile_size(vibe_profile_id)
-                # Update the vector
-                self.update_vibe_profile_vector(vibe_profile_id)
-                return True
+            if not profile_result.data:
+                print(f"Vibe profile {vibe_profile_id} not found")
+                return False
+            
+            current_item_ids = profile_result.data[0].get('seed_item_ids', [])
+            
+            # Remove item from the list
+            if item_id in current_item_ids:
+                new_item_ids = [id for id in current_item_ids if id != item_id]
+                
+                # Update the vibe profile
+                result = self.supabase.table('vibe_profiles').update({
+                    'seed_item_ids': new_item_ids,
+                    'size': len(new_item_ids)
+                }).eq('id', vibe_profile_id).execute()
+                
+                if result.data:
+                    # Update the vector
+                    self.update_vibe_profile_vector(vibe_profile_id)
+                    return True
+            
             return False
             
         except Exception as e:
@@ -70,8 +92,30 @@ class VibeProfileManager:
     def get_items_for_vibe_profile(self, vibe_profile_id: str) -> List[Dict[str, Any]]:
         """Get all items for a vibe profile."""
         try:
-            result = self.supabase.table('vibe_profile_items').select('*, items(*)').eq('vibe_profile_id', vibe_profile_id).execute()
-            return result.data or []
+            # Get the vibe profile with its seed_item_ids
+            profile_result = self.supabase.table('vibe_profiles').select('seed_item_ids').eq('id', vibe_profile_id).execute()
+            
+            if not profile_result.data:
+                return []
+            
+            item_ids = profile_result.data[0].get('seed_item_ids', [])
+            
+            if not item_ids:
+                return []
+            
+            # Get the items
+            items_result = self.supabase.table('items').select('*').in_('id', item_ids).execute()
+            
+            # Format to match the old junction table structure
+            formatted_items = []
+            for item in (items_result.data or []):
+                formatted_items.append({
+                    'items': item,
+                    'item_id': item['id'],
+                    'vibe_profile_id': vibe_profile_id
+                })
+            
+            return formatted_items
         except Exception as e:
             print(f"Error getting items for vibe profile: {e}")
             return []
@@ -79,8 +123,26 @@ class VibeProfileManager:
     def get_vibe_profiles_for_item(self, item_id: str) -> List[Dict[str, Any]]:
         """Get all vibe profiles for an item."""
         try:
-            result = self.supabase.table('vibe_profile_items').select('*, vibe_profiles(*)').eq('item_id', item_id).execute()
-            return result.data or []
+            # Get all vibe profiles and filter those that contain this item_id
+            profiles_result = self.supabase.table('vibe_profiles').select('*').execute()
+            
+            # Filter profiles that contain this item_id in their seed_item_ids
+            matching_profiles = []
+            for profile in (profiles_result.data or []):
+                seed_item_ids = profile.get('seed_item_ids', [])
+                if item_id in seed_item_ids:
+                    matching_profiles.append(profile)
+            
+            # Format to match the old junction table structure
+            formatted_profiles = []
+            for profile in matching_profiles:
+                formatted_profiles.append({
+                    'vibe_profiles': profile,
+                    'item_id': item_id,
+                    'vibe_profile_id': profile['id']
+                })
+            
+            return formatted_profiles
         except Exception as e:
             print(f"Error getting vibe profiles for item: {e}")
             return []
@@ -106,12 +168,15 @@ class VibeProfileManager:
     def _update_vibe_profile_size(self, vibe_profile_id: str):
         """Update the size field for a vibe profile."""
         try:
-            # Count items for this vibe profile
-            count_result = self.supabase.table('vibe_profile_items').select('id', count='exact').eq('vibe_profile_id', vibe_profile_id).execute()
-            count = count_result.count or 0
+            # Get the vibe profile with its seed_item_ids
+            profile_result = self.supabase.table('vibe_profiles').select('seed_item_ids').eq('id', vibe_profile_id).execute()
             
-            # Update the size field
-            self.supabase.table('vibe_profiles').update({'size': count}).eq('id', vibe_profile_id).execute()
+            if profile_result.data:
+                item_ids = profile_result.data[0].get('seed_item_ids', [])
+                count = len(item_ids)
+                
+                # Update the size field
+                self.supabase.table('vibe_profiles').update({'size': count}).eq('id', vibe_profile_id).execute()
             
         except Exception as e:
             print(f"Error updating vibe profile size: {e}")
@@ -142,7 +207,8 @@ class VibeProfileManager:
             result = self.supabase.table('vibe_profiles').insert({
                 'name': name,
                 'vector': default_vector,
-                'size': 0
+                'size': 0,
+                'seed_item_ids': []
             }).execute()
             
             if result.data:
@@ -360,8 +426,8 @@ class VibeProfileManager:
             vector = np.array(vector, dtype=np.float32)
             
             # Get poems already in this vibe profile to exclude them
-            existing_items_result = self.supabase.table('vibe_profile_items').select('item_id').eq('vibe_profile_id', vibe_profile_id).execute()
-            existing_item_ids = {item['item_id'] for item in (existing_items_result.data or [])}
+            profile_result = self.supabase.table('vibe_profiles').select('seed_item_ids').eq('id', vibe_profile_id).execute()
+            existing_item_ids = set(profile_result.data[0].get('seed_item_ids', []) if profile_result.data else [])
             
             # Add additional items to exclude (e.g., already displayed items)
             if exclude_item_ids:
@@ -489,10 +555,7 @@ class VibeProfileManager:
     def delete_vibe_profile(self, vibe_profile_id: str) -> bool:
         """Delete a vibe profile and all its associated items."""
         try:
-            # First, delete all vibe_profile_items entries for this vibe profile
-            delete_items_result = self.supabase.table('vibe_profile_items').delete().eq('vibe_profile_id', vibe_profile_id).execute()
-            
-            # Then delete the vibe profile itself
+            # Delete the vibe profile (seed_item_ids will be automatically cleaned up)
             delete_vibe_result = self.supabase.table('vibe_profiles').delete().eq('id', vibe_profile_id).execute()
             
             if delete_vibe_result.data:

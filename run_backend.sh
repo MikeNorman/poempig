@@ -28,8 +28,9 @@ if ! python -c "import flask, numpy, pandas" >/dev/null 2>&1; then
 fi
 
 export PORT="${PORT:-5001}"
-echo "Starting Flask on http://localhost:${PORT}"
-echo "Tip: Template pages at /old and /find_similar.html"
+echo "🚀 Starting Poem Recommender with full functionality..."
+echo "🌐 Open http://localhost:${PORT} in your browser"
+echo "📊 Health check: http://localhost:${PORT}/health"
 exec python app.py
 
 

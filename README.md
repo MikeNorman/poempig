@@ -62,21 +62,20 @@ poem_recommender/
 
 ## Usage
 
-### Quick Start Options
+### Quick Start
 
-#### Option 1: Full App (Recommended)
 ```bash
-# Use the provided startup script (handles virtual environment automatically)
+# Start the app with full functionality
 ./run_backend.sh
 ```
 
-#### Option 2: Simple Mode (Fast startup, limited features)
-```bash
-# Start with minimal dependencies for quick testing
-./start_simple.sh
-```
+This will:
+- ✅ Automatically handle virtual environment
+- ✅ Install all dependencies (including ML packages)
+- ✅ Start with full recommendation engine functionality
+- ✅ All features available
 
-#### Option 3: Manual Setup
+**Alternative Manual Setup:**
 ```bash
 # Activate virtual environment
 source venv/bin/activate
@@ -88,7 +87,7 @@ pip install -r requirements.txt
 python app.py
 ```
 
-**Note:** If you encounter dependency issues (especially with scikit-learn on Python 3.13), use Option 2 for quick testing or update your Python version.
+**Health Check:** Visit `http://localhost:5001/health` to verify all features are working.
 
 Then visit `http://localhost:5001` in your browser.
 
@@ -121,6 +120,30 @@ The `poems` table contains:
 - **Embedding Generation**: Create OpenAI embeddings for similarity search
 - **Web Interface**: Simple Flask-based UI for poem recommendations
 - **Database Storage**: Supabase for scalable data storage
+
+## Troubleshooting
+
+### Common Issues
+
+**"Recommendation engine not available"**
+- The app automatically tries to load all ML features
+- If dependencies are missing, some features will be disabled
+- Check `http://localhost:5001/health` to see which features are available
+
+**Dependency installation fails**
+- The app gracefully handles missing ML dependencies
+- Basic web interface will work even if ML packages fail to install
+- Check `http://localhost:5001/health` to see available features
+
+**Port 5001 already in use**
+```bash
+# Kill any existing processes
+lsof -ti:5001 | xargs kill -9 2>/dev/null || true
+```
+
+**Python 3.13 compatibility issues**
+- All dependencies are now compatible with Python 3.13
+- The app will automatically use full functionality when dependencies are available
 
 ## Development
 

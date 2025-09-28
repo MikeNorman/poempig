@@ -34,20 +34,30 @@ def embed(text: str):
 def main():
     print("🔍 Finding poems without embeddings...")
     
-    # Get all poems that don't have embeddings
-    poems_without_embeddings = sb.table('poems').select('id, text, author, title').is_('embedding', 'null').execute()
+    # Get all items that don't have embeddings (with pagination to get all)
+    items_without_embeddings = []
+    offset = 0
+    limit = 1000
     
-    if not poems_without_embeddings.data:
-        print("✅ All poems already have embeddings!")
+    while True:
+        batch = sb.table('items').select('id, text, author, title, type').is_('embedding', 'null').range(offset, offset + limit - 1).execute()
+        if not batch.data:
+            break
+        items_without_embeddings.extend(batch.data)
+        offset += limit
+        print(f"Found {len(items_without_embeddings)} items without embeddings so far...")
+    
+    if not items_without_embeddings:
+        print("✅ All items already have embeddings!")
         return
     
-    print(f"📝 Found {len(poems_without_embeddings.data)} poems without embeddings")
+    print(f"📝 Found {len(items_without_embeddings)} items without embeddings")
     
-    # Process each poem
-    for poem in tqdm(poems_without_embeddings.data, desc="Generating embeddings"):
+    # Process each item
+    for item in tqdm(items_without_embeddings, desc="Generating embeddings"):
         try:
             # Generate embedding
-            embedding = embed(poem['text'])
+            embedding = embed(item['text'])
             
             # Ensure embedding is a proper list/array
             if isinstance(embedding, str):
@@ -55,20 +65,20 @@ def main():
                 import json
                 embedding = json.loads(embedding)
             
-            # Update the poem with the embedding
-            sb.table('poems').update({
+            # Update the item with the embedding
+            sb.table('items').update({
                 'embedding': embedding
-            }).eq('id', poem['id']).execute()
+            }).eq('id', item['id']).execute()
             
         except Exception as e:
-            print(f"❌ Error processing poem {poem['id']}: {e}")
+            print(f"❌ Error processing item {item['id']} ({item.get('type', 'unknown')}): {e}")
             continue
     
     print("✅ Embedding generation complete!")
     
     # Verify results
-    poems_with_embeddings = sb.table('poems').select('id').not_.is_('embedding', 'null').execute()
-    print(f"📊 Total poems with embeddings: {len(poems_with_embeddings.data)}")
+    items_with_embeddings = sb.table('items').select('id', count='exact').not_.is_('embedding', 'null').execute()
+    print(f"📊 Total items with embeddings: {items_with_embeddings.count}")
 
 if __name__ == "__main__":
     main()

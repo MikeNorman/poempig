@@ -135,25 +135,38 @@
 
         async function loadSeedItem(seedId) {
             try {
-                const response = await fetch(`${API_BASE_URL}/item/${seedId}`);
+                // Create a new vibe profile with the seed item
+                const response = await fetch(`${API_BASE_URL}/create-vibe-profile`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: 'New Vibe',
+                        item_ids: [seedId]
+                    })
+                });
+                
                 if (!response.ok) {
-                    throw new Error('Item not found');
+                    throw new Error('Failed to create vibe profile');
                 }
                 
-                const item = await response.json();
-                vibeProfilePoems.add(item.id);
-                currentVibeProfileName = 'New Vibe';
-                isExistingVibeProfile = false;
+                const data = await response.json();
+                currentVibeProfileId = data.vibe_profile_id;
+                isExistingVibeProfile = true;
                 
-                // Display the vibe seeds
-                await displayVibeSeeds();
+                // Update URL to reflect the vibe profile ID
+                const newUrl = new URL(window.location);
+                newUrl.searchParams.delete('seed_id');
+                newUrl.searchParams.set('vibe_profile_id', currentVibeProfileId);
+                window.history.replaceState({}, '', newUrl);
                 
-                // Load similar poems
-                loadSimilarPoems(seedId);
+                // Navigate to vibe profile page after a short delay
+                setTimeout(() => {
+                    window.location.href = `/vibe-profile.html?vibe_profile_id=${currentVibeProfileId}`;
+                }, 2000);
                 
             } catch (error) {
-                console.error('Error loading seed item:', error);
-                showError('Error loading seed item: ' + error.message);
+                console.error('Error creating vibe profile automatically:', error);
+                showError('Failed to create vibe profile: ' + error.message);
             }
         }
 
